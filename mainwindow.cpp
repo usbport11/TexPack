@@ -88,31 +88,25 @@ void MainWindow::on_pushButton_3_clicked() {
     QImage mainImage(mainPixmap.toImage());
     int level = 50;
 
-    QPoint p1(-1,-1), p2(-1,-1);
-    for (int x = 0 ; x < mainImage.width(); x++) {
-        for (int y = 0 ; y < mainImage.height(); y++) {
-            if(p1.x() != -1 && p1.y() != -1 && p2.x() != -1 && p2.y() != -1) {
-                break;
-            }
-            if(p1.x() == -1 || p1.y() == -1) {
-                QColor currentPixel = (mainImage.pixelColor(x, y));
-                if (currentPixel.alpha() > level) {
-                    if(p1.x() == -1) p1.setX(x);
-                    if(p1.y() == -1) p1.setY(y);
-                }
-            }
-            if(p2.x() == -1 || p2.y() == -1) {
-                QColor currentPixel = (mainImage.pixelColor(mainImage.width() - x, mainImage.height() - y));
-                if (currentPixel.alpha() > level) {
-                    if(p2.x() == -1) p2.setX(mainImage.width() - x);
-                    if(p2.y() == -1) p2.setY(mainImage.height() - y);
-                }
+    //need think about optimize
+    int min[2] = {mainImage.width(), mainImage.height()}, max[2] = {0, 0};
+    for (int x = 1 ; x < mainImage.width() - 1; x++) {
+        for (int y = 1 ; y < mainImage.height() - 1; y++) {
+            QColor currentPixel = (mainImage.pixelColor(x, y));
+            if (currentPixel.alpha() > level) {
+                if(min[0] > x) min[0] = x;
+                if(min[1] > y) min[1] = y;
+                if(max[0] < x) max[0] = x;
+                if(max[1] < y) max[1] = y;
             }
         }
     }
-    QMessageBox msgBox;
-    msgBox.setText("(" + QString::number(p1.x()) + ", "+ QString::number(p1.x()) + ") (" + QString::number(p2.x()) + ", "+ QString::number(p2.x())+ ")");
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.setDefaultButton(QMessageBox::Ok);
-    msgBox.exec();
+
+    QRect rect(min[0], min[1], max[0], max[1]);
+    mainImage = mainImage.copy(rect);
+    mainPixmap = QPixmap::fromImage(mainImage);
+    QSize size = mainPixmap.size();
+
+    ui->label->setPixmap(mainPixmap);
+    ui->label_2->setText(QString::number(size.width()) + " x "+ QString::number(size.height()));
 }
