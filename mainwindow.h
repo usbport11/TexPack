@@ -9,6 +9,10 @@
 #include <QPainter>
 #include <QImage>
 #include <QBitmap>
+#include <QtMath>
+#include <QTextStream>
+#include <vector>
+#include <algorithm>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,10 +29,10 @@ public:
 private slots:
     void on_pushButton_clicked();
     void on_listView_clicked(const QModelIndex &index);
-
     void on_pushButton_2_clicked();
-
     void on_pushButton_3_clicked();
+    void on_pushButton_4_clicked();
+    std::vector<QRect> Pack(std::vector<QRect> rects);
 
 private:
     Ui::MainWindow* ui;
