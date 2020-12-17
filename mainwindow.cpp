@@ -110,3 +110,88 @@ void MainWindow::on_pushButton_3_clicked() {
     ui->label->setPixmap(mainPixmap);
     ui->label_2->setText(QString::number(size.width()) + " x "+ QString::number(size.height()));
 }
+
+std::vector<QRect> MainWindow::Pack(std::vector<QRect> rects) {
+    std::vector<QRect> packed;
+    if(rects.empty()) {
+        return packed;
+    }
+
+    int area = 0;
+    int maxWidth = 0;
+    for(int i = 0; i < rects.size(); i++) {
+        area = rects[i].width() * rects[i].height();
+        maxWidth = std::max(maxWidth, rects[i].width());
+    }
+
+    struct {
+        bool operator()(QRect a, QRect b) const {
+            return a.height() > b.height();
+        }
+    } heightLess;
+    std::sort(rects.begin(), rects.end(), heightLess);
+
+    int startWidth = std::max(qCeil(qSqrt(area / 0.95)), maxWidth);
+    std::vector<QRect> spaces;
+    spaces.push_back(QRect(0, 0, startWidth, INT_MAX));
+
+    for(int i = 0; i < rects.size(); i++) {
+        for(int j = spaces.size() - 1; j >= 0; j--) {
+            QRect space = spaces[j];
+            if(rects[i].width() > space.width() || rects[i].height() > space.height()) {
+                continue;
+            }
+            QRect rect = QRect(space.x(), space.y(), rects[i].width(), rects[i].height());
+            packed.push_back(rect);
+            if(rects[i].width() == space.width() && rects[i].height() == space.height()) {
+                QRect last = spaces.back();
+                spaces.pop_back();
+                if (j < spaces.size()) spaces[j] = last;
+            }
+            else if(rects[i].height() == space.height()) {
+                space.setX(space.x() + rects[i].width());
+                space.setWidth(space.width() - rects[i].width());
+            }
+            else if(rects[i].width() == space.width()) {
+                space.setY(space.y() + rects[i].height());
+                space.setHeight(space.height() - rects[i].height());
+            }
+            else {
+                spaces.push_back(QRect(space.x() + rects[i].width(), space.y(), space.width() - rects[i].width(), rects[i].height()));
+            }
+            space.setY(space.y() + rects[i].height());
+            space.setHeight(space.height() - rects[i].height());
+        }
+        //break;
+    }
+
+    QFile file("E:\\QtProjects\\test1\\out.txt");
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream out(&file);
+            for(int i = 0; i < packed.size(); i++) {
+                out << packed[i].x() << packed[i].y() << packed[i].width() << packed[i].height() << "\n";
+            }
+        }
+
+    return packed;
+}
+
+void MainWindow::on_pushButton_4_clicked() {
+    std::vector<QRect> testRects;
+    testRects.push_back(QRect(0,0,100,200));
+    testRects.push_back(QRect(0,0,50,50));
+    testRects.push_back(QRect(0,0,150,50));
+    testRects.push_back(QRect(0,0,200,100));
+    testRects.push_back(QRect(0,0,100,100));
+    std::vector<QRect> result = Pack(testRects);
+
+    QImage resultImage(QSize(800, 800), QImage::Format_RGBA8888);
+    QPainter resultPainter(&resultImage);
+    for(int i=0; i < result.size(); i++) {
+        resultPainter.setPen(i+1);
+        resultPainter.drawRect(result[i]);
+    }
+    QPixmap mainPixmap = QPixmap::fromImage(resultImage);
+    ui->label->setPixmap(mainPixmap);
+    ui->label_2->setText(QString::number(result.size()));
+}
