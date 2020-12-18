@@ -10,3 +10,5 @@ Need test:
 2) Apply changes to all pictures
 3) Sizing at window (result picture more than free space on form)
 4) Export to formats
+
+<img src="screen.png" />
