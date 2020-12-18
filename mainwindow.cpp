@@ -14,7 +14,7 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked() {
+void MainWindow::on_btnFilesOpen_clicked() {
     QStringList files = QFileDialog::getOpenFileNames(this, "Select one or more files to open", "/home", "Images (*.png)");
     if(files.empty()) return;
     model->removeRows(0, model->rowCount());
@@ -53,7 +53,7 @@ void MainWindow::on_listView_clicked(const QModelIndex &index) {
     }
 }
 
-void MainWindow::on_pushButton_2_clicked() {
+void MainWindow::on_btnRemoveColor_clicked() {
     QPixmap mainPixmap = ui->label->pixmap(Qt::ReturnByValue);
     if(mainPixmap.isNull()) {
         return;
@@ -79,7 +79,7 @@ void MainWindow::on_pushButton_2_clicked() {
     ui->label->setPixmap(mainPixmap);
 }
 
-void MainWindow::on_pushButton_3_clicked() {
+void MainWindow::on_btnCompactImage_clicked() {
     QPixmap mainPixmap = ui->label->pixmap(Qt::ReturnByValue);
     if(mainPixmap.isNull()) {
         return;
@@ -109,6 +109,40 @@ void MainWindow::on_pushButton_3_clicked() {
 
     ui->label->setPixmap(mainPixmap);
     ui->label_2->setText(QString::number(size.width()) + " x "+ QString::number(size.height()));
+}
+
+void MainWindow::on_btnPackImages_clicked() {
+    int rowNumber = model->rowCount();
+    if(!rowNumber) return;
+
+    std::vector<stPixmapRect> pixmapRects;
+    std::vector<QImage> images;
+    pixmapRects.reserve(rowNumber);
+    images.reserve(rowNumber);
+
+    for(int i=0; i<rowNumber; i++) {
+        QImage image(model->index(i).data().toString());
+        QSize size = image.size();
+        images.push_back(image);
+        pixmapRects.push_back(stPixmapRect(QRect(0, 0, size.width(), size.height()), &images[i]));
+    }
+
+    std::vector<stPixmapRect> result = packRects2(pixmapRects);
+
+    QImage resultImage(QSize(600, 500), QImage::Format_RGBA8888);
+    QPainter resultPainter(&resultImage);
+    for(int i=0; i < result.size(); i++) {
+        QRect rect = result[i].rect;
+        QImage image = *result[i].pImage;
+        resultPainter.drawImage(rect, image);
+    }
+    QPixmap mainPixmap = QPixmap::fromImage(resultImage);
+    ui->label->setPixmap(mainPixmap);
+    ui->label_2->setText(QString::number(result.size()));
+
+    pixmapRects.clear();
+    images.clear();
+    result.clear();
 }
 
 std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects) {
@@ -163,39 +197,4 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
     }
     spaces.clear();
     return packed;
-}
-
-
-void MainWindow::on_pushButton_4_clicked() {
-    int rowNumber = model->rowCount();
-    if(!rowNumber) return;
-
-    std::vector<stPixmapRect> pixmapRects;
-    std::vector<QImage> images;
-    pixmapRects.reserve(rowNumber);
-    images.reserve(rowNumber);
-
-    for(int i=0; i<rowNumber; i++) {
-        QImage image(model->index(i).data().toString());
-        QSize size = image.size();
-        images.push_back(image);
-        pixmapRects.push_back(stPixmapRect(QRect(0, 0, size.width(), size.height()), &images[i]));
-    }
-
-    std::vector<stPixmapRect> result = packRects2(pixmapRects);
-
-    QImage resultImage(QSize(600, 500), QImage::Format_RGBA8888);
-    QPainter resultPainter(&resultImage);
-    for(int i=0; i < result.size(); i++) {
-        QRect rect = result[i].rect;
-        QImage image = *result[i].pImage;
-        resultPainter.drawImage(rect, image);
-    }
-    QPixmap mainPixmap = QPixmap::fromImage(resultImage);
-    ui->label->setPixmap(mainPixmap);
-    ui->label_2->setText(QString::number(result.size()));
-
-    pixmapRects.clear();
-    images.clear();
-    result.clear();
 }
