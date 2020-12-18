@@ -168,6 +168,7 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
 
 void MainWindow::on_pushButton_4_clicked() {
     int rowNumber = model->rowCount();
+    if(!rowNumber) return;
 
     std::vector<stPixmapRect> pixmapRects;
     std::vector<QImage> images;
