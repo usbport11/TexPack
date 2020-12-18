@@ -40,11 +40,11 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_btnFilesOpen_clicked();
     void on_listView_clicked(const QModelIndex &index);
-    void on_pushButton_2_clicked();
-    void on_pushButton_3_clicked();
-    void on_pushButton_4_clicked();
+    void on_btnRemoveColor_clicked();
+    void on_btnCompactImage_clicked();
+    void on_btnPackImages_clicked();
     std::vector<stPixmapRect> packRects2(std::vector<stPixmapRect> rects);
 
 private:
