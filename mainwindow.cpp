@@ -121,7 +121,7 @@ std::vector<QRect> MainWindow::Pack(std::vector<QRect> rects) {
     int maxWidth = 0;
     for(int i = 0; i < rects.size(); i++) {
         //area = rects[i].width() * rects[i].height();
-        area *= rects[i].width() * rects[i].height();
+        area += rects[i].width() * rects[i].height();
         maxWidth = std::max(maxWidth, rects[i].width());
     }
 
