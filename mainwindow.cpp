@@ -160,8 +160,8 @@ std::vector<QRect> MainWindow::Pack(std::vector<QRect> rects) {
             else {
                 spaces.push_back(QRect(space.x() + rects[i].width(), space.y(), space.width() - rects[i].width(), rects[i].height()));
             }
-            space.setY(space.y() + rects[i].height());
-            space.setHeight(space.height() - rects[i].height());
+            //space.setY(space.y() + rects[i].height());
+            //space.setHeight(space.height() - rects[i].height());
         }
         //break;
     }
