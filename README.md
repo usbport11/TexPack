@@ -1,4 +1,4 @@
-Testing png files packer.
+PNG files packer.
 
 Passed:
 1) Remove fill color from image - OK
