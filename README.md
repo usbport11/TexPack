@@ -15,8 +15,8 @@ Need test:
 
 Using in cocos2d-x:
 <pre>
-SpriteFrameCache* a = SpriteFrameCache::getInstance();
-a->addSpriteFramesWithFile("resources/out.plist");
+SpriteFrameCache* cache = SpriteFrameCache::getInstance();
+cache->addSpriteFramesWithFile("resources/out.plist");
 
 auto visibleSize = Director::getInstance()->getVisibleSize();
 Vec2 origin = Director::getInstance()->getVisibleOrigin();
