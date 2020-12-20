@@ -11,4 +11,4 @@ Need test:
 2) Apply changes to all pictures
 3) Sizing at window (result picture more than free space on form)
 
-<img src="screen.png" />
+<br/><img src="screen.png" />
