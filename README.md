@@ -9,7 +9,7 @@ Passed:
 Need test:
 1) Save changes (remove fill color and crop) at session
 2) Apply changes to all pictures
-3) Sizing at window (result picture more than free space on form)
+3) Sizing at window (packed picture size more than free space on form)
 
 <br/><img src="screen.png" /><br/>
 
