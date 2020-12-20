@@ -139,13 +139,81 @@ void MainWindow::on_btnPackImages_clicked() {
     QPixmap mainPixmap = QPixmap::fromImage(resultImage);
     ui->label->setPixmap(mainPixmap);
     ui->label_2->setText(QString::number(result.size()));
+    
+    //export png
+    QString fullFileName;
+    fullFileName = "E:\\QtProjects\\test1\\" + ui->edtOutFilename->text() + ".png";
+    QFile pngFile(fullFileName);
+    pngFile.open(QIODevice::WriteOnly);
+    mainPixmap.save(&pngFile, "PNG");
+    
+    //export plist
+    fullFileName = "E:\\QtProjects\\test1\\" + ui->edtOutFilename->text() + ".plist";
+    QFile plistFfile(fullFileName);
+    if (plistFfile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&plistFfile);
+        out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist>\n<plist version=\"1.0\">\n";
+        out << "\t<dict>\n\t\t<key>frames</key>\n\t\t<dict>\n";
+        for(int i=0; i < result.size(); i++) {
+            out << "\t\t\t<key>pt" << QString::number(i) << "</key>\n";
+            out << "\t\t\t<dict>\n";
+            out << "\t\t\t\t<key>aliases</key>\n";
+            out << "\t\t\t\t<array/>\n";
+            out << "\t\t\t\t<key>spriteOffset</key>\n";
+            out << "\t\t\t\t<string>{0,0}</string>\n";
+            out << "\t\t\t\t<key>spriteSize</key>\n";
+            out << "\t\t\t\t<string>{" << result[i].rect.width() << "," << result[i].rect.height() << "}</string>\n";
+            out << "\t\t\t\t<key>spriteSourceSize</key>\n";
+            out << "\t\t\t\t<string>{" << result[i].rect.width() << "," << result[i].rect.height() << "}</string>\n";
+            out << "\t\t\t\t<key>textureRect</key>\n";
+            out << "\t\t\t\t<string>{{" << result[i].rect.x() << "," << result[i].rect.y() << "},{" << result[i].rect.width() << "," << result[i].rect.height() << "}}</string>\n";
+            out << "\t\t\t\t<key>textureRotated</key>\n";
+            out << "\t\t\t\t<false/>\n";
+            out << "\t\t\t\t<key>triangles</key>\n";
+            //may change
+            out << "\t\t\t\t<string>1 2 3 0 1 3</string>\n";
+            out << "\t\t\t\t<key>vertices</key>\n";
+            //may change
+            out << "\t\t\t\t<string>" << result[i].rect.width() << " " << result[i].rect.height() << " " <<
+                0 << " " << result[i].rect.height() << " " <<
+                0 << " " << 0 << " " <<
+                result[i].rect.width() << " " << 0 <<
+                "</string>\n";
+            out << "\t\t\t\t<key>verticesUV</key>\n";
+            //may change
+            out << "\t\t\t\t<string>" << result[i].rect.x() + result[i].rect.width() << " " << result[i].rect.y() + result[i].rect.height() << " " <<
+                result[i].rect.x() << " " << result[i].rect.y() + result[i].rect.height() << " " <<
+                result[i].rect.x() << " " << result[i].rect.y() << " " <<
+                result[i].rect.x() + result[i].rect.width() << " " << result[i].rect.y() <<
+                "</string>\n";
+            out << "\t\t\t</dict>\n";
+        }
+        out << "\t\t</dict>\n";
+        out << "\t\t<key>metadata</key>\n";
+        out << "\t\t<dict>\n";
+        out << "\t\t\t<key>format</key>\n";
+        out << "\t\t\t<integer>3</integer>\n";
+        out << "\t\t\t<key>pixelFormat</key>\n";
+        //may change
+        out << "\t\t\t<string>RGBA8888</string>\n";
+        out << "\t\t\t<key>premultiplyAlpha</key>\n";
+        out << "\t\t\t<false/>\n";
+        out << "\t\t\t<key>realTextureFileName</key>\n";
+        out << "\t\t\t<string>" << ui->edtOutFilename->text() << ".png" << "</string>\n";
+        out << "\t\t\t<key>size</key>\n";
+        out << "\t\t\t<string>{" << resultSize.width() << "," << resultSize.height() << "}</string>\n";
+        out << "\t\t\t<key>textureFileName</key>\n";
+        out << "\t\t\t<string>" << ui->edtOutFilename->text() << ".png</string>\n";
+        out << "\t\t</dict>\n";
+        out << "\t</dict>\n</plist>";
+    }
 
     pixmapRects.clear();
     images.clear();
     result.clear();
 }
 
-std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects) {
+std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects, QSize& size) {
     std::vector<stPixmapRect> packed;
     if(rects.empty()) {
         return packed;
@@ -196,5 +264,7 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
         }
     }
     spaces.clear();
+    size = resultSize;
+    
     return packed;
 }
