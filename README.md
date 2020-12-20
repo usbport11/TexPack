@@ -10,6 +10,8 @@ Need test:
 1) Save changes (remove fill color and crop) at session
 2) Apply changes to all pictures
 3) Sizing at window (packed picture size more than free space on form)
+4) Naming frames inside plist file by png files names
+5) Remove/add pictures in list view
 
 <br/><img src="screen.png" /><br/>
 
