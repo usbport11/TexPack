@@ -45,7 +45,7 @@ private slots:
     void on_btnRemoveColor_clicked();
     void on_btnCompactImage_clicked();
     void on_btnPackImages_clicked();
-    std::vector<stPixmapRect> packRects2(std::vector<stPixmapRect> rects);
+    std::vector<stPixmapRect> packRects2(std::vector<stPixmapRect> rects, QSize& size);
 
 private:
     Ui::MainWindow* ui;
