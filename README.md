@@ -11,4 +11,20 @@ Need test:
 2) Apply changes to all pictures
 3) Sizing at window (result picture more than free space on form)
 
-<br/><img src="screen.png" />
+<br/><img src="screen.png" /><br/>
+
+Using in cocos2d-x:
+<pre>
+SpriteFrameCache* a = SpriteFrameCache::getInstance();
+a->addSpriteFramesWithFile("resources/out.plist");
+
+auto visibleSize = Director::getInstance()->getVisibleSize();
+Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+auto frame = a->getSpriteFrameByName("pt0");
+auto sprite = Sprite::createWithSpriteFrame(frame);
+sprite->setPosition(0, 0);
+sprite->setAnchorPoint(Vec2(0,0));
+sprite->retain();
+this->addChild(sprite);
+</pre>
