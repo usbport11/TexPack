@@ -1,4 +1,4 @@
-PNG files packer.
+PNG files packer (create texture atlas).
 
 Passed:
 1) Remove fill color from image - OK
