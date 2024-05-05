@@ -7,11 +7,31 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     model = new QStringListModel(this);
     ui->listView->setModel(model);
+    ui->listView->installEventFilter(this);
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+    saveDirectory = qApp->applicationDirPath();
+    ui->label_5->setText(saveDirectory);
+    ui->edtAlphaLevel->setValidator(new QIntValidator(0, 255, this));
 }
 
 MainWindow::~MainWindow() {
     delete ui;
+}
+
+bool MainWindow::eventFilter(QObject* object, QEvent* event)
+{
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent *>(event);
+        if (keyEvent->key() == Qt::Key_Delete) {
+            model->removeRow(ui->listView->currentIndex().row());
+            ui->label->clear();
+            ui->label_2->setText("0 x 0");
+        }
+        return true;
+    }
+    else {
+        return QObject::eventFilter(object, event);
+    }
 }
 
 void MainWindow::on_btnFilesOpen_clicked() {
@@ -27,6 +47,8 @@ void MainWindow::on_btnFilesOpen_clicked() {
     }
 
     ui->label->clear();
+    ui->label->setText("Preview Image");
+    ui->label_2->setText("0 x 0");
 }
 
 void MainWindow::on_listView_clicked(const QModelIndex &index) {
@@ -86,13 +108,18 @@ void MainWindow::on_btnCompactImage_clicked() {
     }
 
     QImage mainImage(mainPixmap.toImage());
+    QString preLevel = ui->edtAlphaLevel->text();
+    preLevel.replace(" ", "");
     int level = 50;
+    if(preLevel.length() > 0) {
+      level = preLevel.toInt();
+    }
 
     //need think about optimize
     int min[2] = {mainImage.width(), mainImage.height()}, max[2] = {0, 0};
     for (int x = 1 ; x < mainImage.width() - 1; x++) {
         for (int y = 1 ; y < mainImage.height() - 1; y++) {
-            QColor currentPixel = (mainImage.pixelColor(x, y));
+            QColor currentPixel = mainImage.pixelColor(x, y);
             if (currentPixel.alpha() > level) {
                 if(min[0] > x) min[0] = x;
                 if(min[1] > y) min[1] = y;
@@ -108,7 +135,7 @@ void MainWindow::on_btnCompactImage_clicked() {
     QSize size = mainPixmap.size();
 
     ui->label->setPixmap(mainPixmap);
-    ui->label_2->setText(QString::number(size.width()) + " x "+ QString::number(size.height()));
+    ui->label_2->setText(QString::number(size.width()) + " x " + QString::number(size.height()));
 }
 
 void MainWindow::on_btnPackImages_clicked() {
@@ -127,34 +154,37 @@ void MainWindow::on_btnPackImages_clicked() {
         pixmapRects.push_back(stPixmapRect(QRect(0, 0, size.width(), size.height()), &images[i]));
     }
 
-    std::vector<stPixmapRect> result = packRects2(pixmapRects);
+    QSize resultSize(0, 0);
+    std::vector<stPixmapRect> result = packRects2(pixmapRects, resultSize);
 
-    QImage resultImage(QSize(600, 500), QImage::Format_RGBA8888);
+    QImage resultImage(QSize(resultSize.width(), resultSize.height()), QImage::Format_RGBA8888);
     QPainter resultPainter(&resultImage);
-    for(int i=0; i < result.size(); i++) {
+    for(size_t i=0; i < result.size(); i++) {
         QRect rect = result[i].rect;
         QImage image = *result[i].pImage;
+        resultPainter.fillRect(rect, Qt::transparent);
+        resultPainter.setCompositionMode(QPainter::CompositionMode_Source);
         resultPainter.drawImage(rect, image);
     }
     QPixmap mainPixmap = QPixmap::fromImage(resultImage);
     ui->label->setPixmap(mainPixmap);
-    ui->label_2->setText(QString::number(result.size()));
-    
+    ui->label_2->setText(QString::number(resultSize.width()) + " x " + QString::number(resultSize.height()));
+
     //export png
     QString fullFileName;
-    fullFileName = "E:\\QtProjects\\test1\\" + ui->edtOutFilename->text() + ".png";
+    fullFileName = saveDirectory + "/"+ ui->edtOutFilename->text() + ".png";
     QFile pngFile(fullFileName);
     pngFile.open(QIODevice::WriteOnly);
     mainPixmap.save(&pngFile, "PNG");
-    
+
     //export plist
-    fullFileName = "E:\\QtProjects\\test1\\" + ui->edtOutFilename->text() + ".plist";
+    fullFileName = saveDirectory + "/"+ ui->edtOutFilename->text() + ".plist";
     QFile plistFfile(fullFileName);
     if (plistFfile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&plistFfile);
         out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist>\n<plist version=\"1.0\">\n";
         out << "\t<dict>\n\t\t<key>frames</key>\n\t\t<dict>\n";
-        for(int i=0; i < result.size(); i++) {
+        for(size_t i=0; i < result.size(); i++) {
             out << "\t\t\t<key>pt" << QString::number(i) << "</key>\n";
             out << "\t\t\t<dict>\n";
             out << "\t\t\t\t<key>aliases</key>\n";
@@ -219,9 +249,10 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
         return packed;
     }
 
+    QSize resultSize(0, 0);
     int area = 0;
     int maxWidth = 0;
-    for(int i = 0; i < rects.size(); i++) {
+    for(size_t i = 0; i < rects.size(); i++) {
         area += rects[i].rect.width() * rects[i].rect.height();
         maxWidth = std::max(maxWidth, rects[i].rect.width());
     }
@@ -233,12 +264,12 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
     } heightLess;
     std::sort(rects.begin(), rects.end(), heightLess);
 
-    int startWidth = std::max(qCeil(qSqrt(area / 0.95)), maxWidth);
+    int startWidth = std::max(qCeil(qSqrt(area / 0.95)), maxWidth); //optimal width?
     std::vector<QRect> spaces;
     spaces.push_back(QRect(0, 0, startWidth, INT_MAX));
 
-    for(int i = 0; i < rects.size(); i++) {
-        for(int j = 0; j < spaces.size(); j++) {
+    for(size_t i = 0; i < rects.size(); i++) {
+        for(size_t j = 0; j < spaces.size(); j++) {
             if(rects[i].rect.width() > spaces[j].width() || rects[i].rect.height() > spaces[j].height()) {
                 continue;
             }
@@ -246,6 +277,8 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
             //add rect
             stPixmapRect pixmapRect(QRect(spaces[j].x(), spaces[j].y(), rects[i].rect.width(), rects[i].rect.height()), rects[i].pImage);
             packed.push_back(pixmapRect);
+            resultSize.setWidth(std::max(resultSize.width(), pixmapRect.rect.x() + pixmapRect.rect.width()));
+            resultSize.setHeight(std::max(resultSize.height(), pixmapRect.rect.y() + pixmapRect.rect.height()));
 
             //split space
             QRect lastSpace = spaces[j];
@@ -265,6 +298,21 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
     }
     spaces.clear();
     size = resultSize;
-    
+
     return packed;
+}
+
+void MainWindow::on_btnSelectDirectory_clicked() {
+    saveDirectory = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "C:\\", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    ui->label_5->setText(saveDirectory);
+    QMessageBox MsgBox;
+    MsgBox.setText("Directory selected: " + saveDirectory);
+    MsgBox.exec();
+}
+
+void MainWindow::on_btnReset_clicked() {
+    model->removeRows(0, model->rowCount());
+    ui->label->clear();
+    ui->label->setText("Preview Image");
+    ui->label_2->setText("0 x 0");
 }

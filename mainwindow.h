@@ -9,8 +9,10 @@
 #include <QPainter>
 #include <QImage>
 #include <QBitmap>
+#include <QBuffer>
 #include <QtMath>
 #include <QTextStream>
+#include <QKeyEvent>
 #include <vector>
 #include <algorithm>
 
@@ -40,15 +42,21 @@ public:
     ~MainWindow();
 
 private slots:
+    bool eventFilter(QObject* object, QEvent* event) override;
     void on_btnFilesOpen_clicked();
-    void on_listView_clicked(const QModelIndex &index);
+    void on_listView_clicked(const QModelIndex& index);
     void on_btnRemoveColor_clicked();
     void on_btnCompactImage_clicked();
     void on_btnPackImages_clicked();
     std::vector<stPixmapRect> packRects2(std::vector<stPixmapRect> rects, QSize& size);
 
+    void on_btnSelectDirectory_clicked();
+
+    void on_btnReset_clicked();
+
 private:
     Ui::MainWindow* ui;
     QStringListModel *model;
+    QString saveDirectory;
 };
 #endif // MAINWINDOW_H
