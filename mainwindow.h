@@ -23,13 +23,20 @@ QT_END_NAMESPACE
 struct stPixmapRect {
     QRect rect;
     QImage* pImage;
+    QString filename;
     stPixmapRect() {
         rect = QRect(0,0,0,0);
         pImage = nullptr;
+        filename = "";
     }
     stPixmapRect(QRect inRect, QImage* inImage) {
         rect = inRect;
         pImage = inImage;
+    }
+    stPixmapRect(QRect inRect, QImage* inImage, QString inFilename) {
+        rect = inRect;
+        pImage = inImage;
+        filename = inFilename;
     }
 };
 
@@ -53,6 +60,10 @@ private slots:
     void on_btnSelectDirectory_clicked();
 
     void on_btnReset_clicked();
+
+    void on_rbtPref_prefix_clicked();
+
+    void on_rbtPref_filename_clicked();
 
 private:
     Ui::MainWindow* ui;

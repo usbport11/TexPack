@@ -44,9 +44,9 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>109</y>
+      <y>139</y>
       <width>621</width>
-      <height>441</height>
+      <height>411</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -203,6 +203,64 @@
     </property>
     <property name="text">
      <string>Path</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>110</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Key prefix</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="edtKeyPrefix">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>110</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>pt</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="rbtPref_prefix">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>110</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Prefix</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="rbtPref_filename">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>110</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>FileName</string>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>
