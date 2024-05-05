@@ -5,6 +5,8 @@ Passed:
 2) Crop image (check transparent pixels) - OK
 3) Create packed image - OK
 4) Export to plist format - OK
+5) Fix artifacts - OK
+6) Add Reset, Select Directory, Path label, Alpha value
 
 Need test:
 1) Save changes (remove fill color and crop) at session
