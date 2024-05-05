@@ -32,3 +32,13 @@ sprite->setAnchorPoint(Vec2(0,0));
 sprite->retain();
 this->addChild(sprite);
 </pre>
+
+<br/>
+
+Deploy
+
+<pre>
+cd C:\Qt\5.15.2\mingw81_64\bin 
+windeployqt E:\QtProjects\build-test1-Desktop_Qt_5_15_2_MinGW_64_bit-Release\release
+add libwinpthread-1.dll, libstdc++-6.dll, libgcc_s_seh-1.dll
+</pre>
