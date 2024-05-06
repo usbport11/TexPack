@@ -9,7 +9,7 @@ Passed:
 6) Add Reset, Select Directory, Path label, Alpha value
 7) Remove image in list by DEL key
 8) Naming frames inside plist file by png files names or prefix
-9) Preview selected source image
+9) Preview selected source image (result image once on finish)
 
 Need test:
 1) Save changes (remove fill color and crop) at session
