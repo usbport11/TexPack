@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->listView->installEventFilter(this);
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     saveDirectory = qApp->applicationDirPath();
-    ui->label_5->setText(saveDirectory);
+    ui->lblDirectoryPath->setText(saveDirectory);
     ui->edtAlphaLevel->setValidator(new QIntValidator(0, 255, this));
 }
 
@@ -24,8 +24,8 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
         QKeyEvent* keyEvent = static_cast<QKeyEvent *>(event);
         if (keyEvent->key() == Qt::Key_Delete) {
             model->removeRow(ui->listView->currentIndex().row());
-            ui->label->clear();
-            ui->label_2->setText("0 x 0");
+            ui->lblPreview->clear();
+            ui->lblSize->setText("0 x 0");
         }
         return true;
     }
@@ -36,8 +36,8 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
 
 void MainWindow::on_btnFilesOpen_clicked() {
     QStringList files = QFileDialog::getOpenFileNames(this, "Select one or more files to open", "/home", "Images (*.png)");
-    if(files.empty()) return;
-    model->removeRows(0, model->rowCount());
+    //if(files.empty()) return;
+    //model->removeRows(0, model->rowCount());
     int row;
     for(auto it = files.begin(); it != files.end(); it++) {
         row = model->rowCount();
@@ -46,37 +46,37 @@ void MainWindow::on_btnFilesOpen_clicked() {
         model->setData(index, it->toLocal8Bit().constData());
     }
 
-    ui->label->clear();
-    ui->label->setText("Preview Image");
-    ui->label_2->setText("0 x 0");
+    //ui->lblPreview->clear();
+    //ui->lblPreview->setText("Preview Image");
+    //ui->lblSize->setText("0 x 0");
 }
 
 void MainWindow::on_listView_clicked(const QModelIndex &index) {
-    ui->label->clear();
+    ui->lblPreview->clear();
 
     QImage mainImage(index.data().toString());
     QPixmap mainPixmap = QPixmap::fromImage(mainImage);
     QSize size = mainPixmap.size();
 
-    ui->label_2->setText(QString::number(size.width()) + " x "+ QString::number(size.height()));
+    ui->lblSize->setText(QString::number(size.width()) + " x "+ QString::number(size.height()));
 
-    if(ui->label->width() <= size.width() || ui->label->height() <= size.height()) {
+    if(ui->lblPreview->width() <= size.width() || ui->lblPreview->height() <= size.height()) {
         float ratio = 0;
         if(size.width() > size.height()) {
-            ratio = (float)ui->label->width() / size.width();
+            ratio = (float)ui->lblPreview->width() / size.width();
         }
         else {
-            ratio = (float)ui->label->height() / size.height();
+            ratio = (float)ui->lblPreview->height() / size.height();
         }
-        ui->label->setPixmap(mainPixmap.scaled(size.width() * ratio, size.height() * ratio, Qt::KeepAspectRatio));
+        ui->lblPreview->setPixmap(mainPixmap.scaled(size.width() * ratio, size.height() * ratio, Qt::KeepAspectRatio));
     }
     else {
-        ui->label->setPixmap(mainPixmap);
+        ui->lblPreview->setPixmap(mainPixmap);
     }
 }
 
 void MainWindow::on_btnRemoveColor_clicked() {
-    QPixmap mainPixmap = ui->label->pixmap(Qt::ReturnByValue);
+    QPixmap mainPixmap = ui->lblPreview->pixmap(Qt::ReturnByValue);
     if(mainPixmap.isNull()) {
         return;
     }
@@ -98,11 +98,11 @@ void MainWindow::on_btnRemoveColor_clicked() {
     resultPainter.end();
     mainPixmap = QPixmap::fromImage(resultImage);
 
-    ui->label->setPixmap(mainPixmap);
+    ui->lblPreview->setPixmap(mainPixmap);
 }
 
 void MainWindow::on_btnCompactImage_clicked() {
-    QPixmap mainPixmap = ui->label->pixmap(Qt::ReturnByValue);
+    QPixmap mainPixmap = ui->lblPreview->pixmap(Qt::ReturnByValue);
     if(mainPixmap.isNull()) {
         return;
     }
@@ -134,8 +134,8 @@ void MainWindow::on_btnCompactImage_clicked() {
     mainPixmap = QPixmap::fromImage(mainImage);
     QSize size = mainPixmap.size();
 
-    ui->label->setPixmap(mainPixmap);
-    ui->label_2->setText(QString::number(size.width()) + " x " + QString::number(size.height()));
+    ui->lblPreview->setPixmap(mainPixmap);
+    ui->lblSize->setText(QString::number(size.width()) + " x " + QString::number(size.height()));
 }
 
 void MainWindow::on_btnPackImages_clicked() {
@@ -169,20 +169,25 @@ void MainWindow::on_btnPackImages_clicked() {
         resultPainter.drawImage(rect, image);
     }
     QPixmap mainPixmap = QPixmap::fromImage(resultImage);
-    ui->label->setPixmap(mainPixmap);
-    ui->label_2->setText(QString::number(resultSize.width()) + " x " + QString::number(resultSize.height()));
+    ui->lblPreview->setPixmap(mainPixmap);
+    ui->lblSize->setText(QString::number(resultSize.width()) + " x " + QString::number(resultSize.height()));
+
+    QString fullFileName;
+    QString prefixName;
+    QString outFile = ui->edtOutFilename->text();
+    outFile.replace(" ", "");
+    if(outFile.length() <= 0) {
+        outFile = "out";
+    }
 
     //export png
-    QString fullFileName;
-    fullFileName = saveDirectory + "/"+ ui->edtOutFilename->text() + ".png";
+    fullFileName = saveDirectory + "/" + outFile + ".png";
     QFile pngFile(fullFileName);
     pngFile.open(QIODevice::WriteOnly);
     mainPixmap.save(&pngFile, "PNG");
 
-    QString prefixName;
-
     //export plist
-    fullFileName = saveDirectory + "/"+ ui->edtOutFilename->text() + ".plist";
+    fullFileName = saveDirectory + "/"+ outFile + ".plist";
     QFile plistFfile(fullFileName);
     if (plistFfile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&plistFfile);
@@ -319,14 +324,14 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
 
 void MainWindow::on_btnSelectDirectory_clicked() {
     saveDirectory = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "C:\\", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    ui->label_5->setText(saveDirectory);
+    ui->lblDirectoryPath->setText(saveDirectory);
 }
 
 void MainWindow::on_btnReset_clicked() {
     model->removeRows(0, model->rowCount());
-    ui->label->clear();
-    ui->label->setText("Preview Image");
-    ui->label_2->setText("0 x 0");
+    ui->lblPreview->clear();
+    ui->lblPreview->setText("Preview Image");
+    ui->lblSize->setText("0 x 0");
 }
 
 void MainWindow::on_rbtPref_prefix_clicked() {

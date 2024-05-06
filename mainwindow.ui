@@ -37,10 +37,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>Open file(s)...</string>
+     <string>Add file(s)...</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="lblPreview">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -62,7 +62,7 @@
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="lblSize">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -140,7 +140,7 @@
      <string>50</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_3">
+   <widget class="QLabel" name="lblAplha">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -179,7 +179,7 @@
      <string>Reset</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_4">
+   <widget class="QLabel" name="lblDirectory">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -192,7 +192,7 @@
      <string>Save directory</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_5">
+   <widget class="QLabel" name="lblDirectoryPath">
     <property name="geometry">
      <rect>
       <x>280</x>
@@ -205,7 +205,7 @@
      <string>Path</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_6">
+   <widget class="QLabel" name="lblKeyPrefix">
     <property name="geometry">
      <rect>
       <x>390</x>
