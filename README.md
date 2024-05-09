@@ -1,22 +1,22 @@
 PNG files packer (create texture atlas).
 
 Passed:
-1) Remove fill color from image
-2) Crop image (check transparent pixels)
-3) Create packed image
-4) Export to plist format
-5) Fix artifacts while image create
-6) Add Reset, Select Directory, Path label, Alpha value
-7) Remove image in list by DEL key
+1) Remove bacground color from image (top left pixel as base color)
+2) Crop image by transparent background pixels
+3) Export to plist format
+4) Fix artifacts while image create, remove back and crop
+5) Add Reset, Select Directory, Path label, Alpha value
+6) Remove image in list by DEL key
+7) Restore image in list by R key
 8) Naming frames inside plist file by png files names or prefix
 9) Preview selected source image (result image once on finish)
 
-Need test:
-1) Save changes (remove fill color and crop) at session
-2) Apply changes to all pictures
-3) Sizing at window (packed picture size more than free space on form)
-4) Remove/add pictures in list view (half)
-5) Preview result image
+To do:
+1) Apply changes to all pictures
+2) Sizing at window (packed picture size more than free space on form)
+3) Remove/add pictures in list view (half)
+4) Preview result image
+5) Crop by pixels number
 
 <br/><img src="screen.png" /><br/>
 
