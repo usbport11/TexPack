@@ -6,8 +6,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow) {
     ui->setupUi(this);
     model = new QStringListModel(this);
-    ui->listView->setModel(model);
-    ui->listView->installEventFilter(this);
+    ui->lstvwSourceFiles->setModel(model);
+    ui->lstvwSourceFiles->installEventFilter(this);
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     saveDirectory = qApp->applicationDirPath();
     ui->lblDirectoryPath->setText(saveDirectory);
@@ -15,17 +15,39 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 MainWindow::~MainWindow() {
-    delete ui;
+    if(ui) delete ui;
+    if(model) delete model;
+    pixmapRects.clear();
 }
 
-bool MainWindow::eventFilter(QObject* object, QEvent* event)
-{
+bool MainWindow::eventFilter(QObject* object, QEvent* event) {
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent* keyEvent = static_cast<QKeyEvent *>(event);
         if (keyEvent->key() == Qt::Key_Delete) {
-            model->removeRow(ui->listView->currentIndex().row());
-            ui->lblPreview->clear();
-            ui->lblSize->setText("0 x 0");
+            if(model->rowCount() <= 0) {
+                return false;
+            }
+            int index = ui->lstvwSourceFiles->currentIndex().row();
+            pixmapRects.erase(pixmapRects.begin() + index);
+            model->removeRow(index);
+            if(model->rowCount() > 0) {
+              index = ui->lstvwSourceFiles->currentIndex().row();
+              ui->lblPreview->setPixmap(QPixmap::fromImage(pixmapRects[index].image));
+              ui->lblSize->setText(QString::number(pixmapRects[index].rect.width()) + " x " + QString::number(pixmapRects[index].rect.height()));
+            }
+            else {
+              ui->lblPreview->clear();
+              ui->lblSize->setText("0 x 0");
+            }
+        }
+        if (keyEvent->key() == 'R') {
+            if(model->rowCount() <= 0) {
+                return false;
+            }
+            int index = ui->lstvwSourceFiles->currentIndex().row();
+            pixmapRects[index].image = QImage(model->index(index).data().toString());
+            ui->lblPreview->setPixmap(QPixmap::fromImage(pixmapRects[index].image));
+            ui->lblSize->setText(QString::number(pixmapRects[index].rect.width()) + " x " + QString::number(pixmapRects[index].rect.height()));
         }
         return true;
     }
@@ -36,26 +58,23 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
 
 void MainWindow::on_btnFilesOpen_clicked() {
     QStringList files = QFileDialog::getOpenFileNames(this, "Select one or more files to open", "/home", "Images (*.png)");
-    //if(files.empty()) return;
-    //model->removeRows(0, model->rowCount());
     int row;
     for(auto it = files.begin(); it != files.end(); it++) {
         row = model->rowCount();
         model->insertRows(row, 1);
         QModelIndex index = model->index(row);
         model->setData(index, it->toLocal8Bit().constData());
+        QImage image(index.data().toString());
+        QSize size = image.size();
+        pixmapRects.push_back(stPixmapRect(QRect(0, 0, size.width(), size.height()), image,
+            QFileInfo(model->index(row).data().toString()).fileName()));
     }
-
-    //ui->lblPreview->clear();
-    //ui->lblPreview->setText("Preview Image");
-    //ui->lblSize->setText("0 x 0");
 }
 
 void MainWindow::on_listView_clicked(const QModelIndex &index) {
     ui->lblPreview->clear();
 
-    QImage mainImage(index.data().toString());
-    QPixmap mainPixmap = QPixmap::fromImage(mainImage);
+    QPixmap mainPixmap = QPixmap::fromImage(pixmapRects[index.row()].image); //error!
     QSize size = mainPixmap.size();
 
     ui->lblSize->setText(QString::number(size.width()) + " x "+ QString::number(size.height()));
@@ -76,38 +95,31 @@ void MainWindow::on_listView_clicked(const QModelIndex &index) {
 }
 
 void MainWindow::on_btnRemoveColor_clicked() {
-    QPixmap mainPixmap = ui->lblPreview->pixmap(Qt::ReturnByValue);
-    if(mainPixmap.isNull()) {
+    int index = ui->lstvwSourceFiles->currentIndex().row();
+    if(model->rowCount() <= 0 || index < 0) {
         return;
     }
-
-    QImage mainImage(mainPixmap.toImage());
-
-    QBitmap colorMask = mainPixmap.createMaskFromColor(mainImage.pixel(0,0), Qt::MaskOutColor);
-    QImage maskImage(mainPixmap.size(), QImage::Format_RGBA8888);
-    QPainter maskPainter(&maskImage);
-    maskPainter.setPen(QColor(255, 255, 255));
-    maskPainter.drawPixmap(mainPixmap.rect(), colorMask, colorMask.rect());
-    maskPainter.end();
-    QPixmap maskPixmap = QPixmap::fromImage(maskImage);
-
-    QImage resultImage(mainPixmap.size(), QImage::Format_RGBA8888);
-    QPainter resultPainter(&resultImage);
-    resultPainter.setClipRegion(QRegion(maskPixmap));
-    resultPainter.drawPixmap(0, 0, mainPixmap);
-    resultPainter.end();
-    mainPixmap = QPixmap::fromImage(resultImage);
-
-    ui->lblPreview->setPixmap(mainPixmap);
+    QImage& image = pixmapRects[index].image;
+    QPixmap maskPixmap(QPixmap::fromImage(image));
+    if(maskPixmap.isNull()) {
+        return;
+    }
+    maskPixmap.setMask(maskPixmap.createHeuristicMask());
+    image = QImage(maskPixmap.toImage());
+    ui->lblPreview->setPixmap(maskPixmap);
 }
 
 void MainWindow::on_btnCompactImage_clicked() {
-    QPixmap mainPixmap = ui->lblPreview->pixmap(Qt::ReturnByValue);
+    int index = ui->lstvwSourceFiles->currentIndex().row();
+    if(model->rowCount() <= 0 || index < 0) {
+        return;
+    }
+    QImage& image = pixmapRects[index].image;
+    QPixmap mainPixmap(QPixmap::fromImage(image));
     if(mainPixmap.isNull()) {
         return;
     }
 
-    QImage mainImage(mainPixmap.toImage());
     QString preLevel = ui->edtAlphaLevel->text();
     preLevel.replace(" ", "");
     int level = 50;
@@ -115,11 +127,11 @@ void MainWindow::on_btnCompactImage_clicked() {
       level = preLevel.toInt();
     }
 
-    //need think about optimize
-    int min[2] = {mainImage.width(), mainImage.height()}, max[2] = {0, 0};
-    for (int x = 1 ; x < mainImage.width() - 1; x++) {
-        for (int y = 1 ; y < mainImage.height() - 1; y++) {
-            QColor currentPixel = mainImage.pixelColor(x, y);
+    //detect new rect
+    int min[2] = {image.width(), image.height()}, max[2] = {0, 0};
+    for (int x = 1 ; x < image.width() - 1; x++) {
+        for (int y = 1 ; y < image.height() - 1; y++) {
+            QColor currentPixel = image.pixelColor(x, y);
             if (currentPixel.alpha() > level) {
                 if(min[0] > x) min[0] = x;
                 if(min[1] > y) min[1] = y;
@@ -130,31 +142,18 @@ void MainWindow::on_btnCompactImage_clicked() {
     }
 
     QRect rect(min[0], min[1], max[0], max[1]);
-    mainImage = mainImage.copy(rect);
-    mainPixmap = QPixmap::fromImage(mainImage);
+    image = image.copy(rect);
+
+    QPixmap newPixmap = QPixmap::fromImage(image);
     QSize size = mainPixmap.size();
 
-    ui->lblPreview->setPixmap(mainPixmap);
+    ui->lblPreview->setPixmap(newPixmap);
     ui->lblSize->setText(QString::number(size.width()) + " x " + QString::number(size.height()));
 }
 
 void MainWindow::on_btnPackImages_clicked() {
     int rowNumber = model->rowCount();
     if(!rowNumber) return;
-
-    std::vector<stPixmapRect> pixmapRects;
-    std::vector<QImage> images;
-    pixmapRects.reserve(rowNumber);
-    images.reserve(rowNumber);
-
-    for(int i=0; i<rowNumber; i++) {
-        QImage image(model->index(i).data().toString());
-        QSize size = image.size();
-        images.push_back(image);
-        //pixmapRects.push_back(stPixmapRect(QRect(0, 0, size.width(), size.height()), &images[i]));
-        pixmapRects.push_back(stPixmapRect(QRect(0, 0, size.width(), size.height()), &images[i],
-            QFileInfo(model->index(i).data().toString()).fileName()));
-    }
 
     QSize resultSize(0, 0);
     std::vector<stPixmapRect> result = packRects2(pixmapRects, resultSize);
@@ -163,10 +162,9 @@ void MainWindow::on_btnPackImages_clicked() {
     QPainter resultPainter(&resultImage);
     for(size_t i=0; i < result.size(); i++) {
         QRect rect = result[i].rect;
-        QImage image = *result[i].pImage;
         resultPainter.fillRect(rect, Qt::transparent);
         resultPainter.setCompositionMode(QPainter::CompositionMode_Source);
-        resultPainter.drawImage(rect, image);
+        resultPainter.drawImage(rect, result[i].image);
     }
     QPixmap mainPixmap = QPixmap::fromImage(resultImage);
     ui->lblPreview->setPixmap(mainPixmap);
@@ -196,6 +194,7 @@ void MainWindow::on_btnPackImages_clicked() {
         for(size_t i=0; i < result.size(); i++) {
             if(ui->edtKeyPrefix->isEnabled()) {
                 prefixName = ui->edtKeyPrefix->text();
+                prefixName.replace(" ", "");
                 if(prefixName.length() <= 0) {
                     prefixName = "pt";
                 }
@@ -244,22 +243,22 @@ void MainWindow::on_btnPackImages_clicked() {
         out << "\t\t\t<key>format</key>\n";
         out << "\t\t\t<integer>3</integer>\n";
         out << "\t\t\t<key>pixelFormat</key>\n";
+
         //may change
         out << "\t\t\t<string>RGBA8888</string>\n";
         out << "\t\t\t<key>premultiplyAlpha</key>\n";
         out << "\t\t\t<false/>\n";
         out << "\t\t\t<key>realTextureFileName</key>\n";
-        out << "\t\t\t<string>" << ui->edtOutFilename->text() << ".png" << "</string>\n";
+        out << "\t\t\t<string>" << outFile << ".png" << "</string>\n";
         out << "\t\t\t<key>size</key>\n";
         out << "\t\t\t<string>{" << resultSize.width() << "," << resultSize.height() << "}</string>\n";
         out << "\t\t\t<key>textureFileName</key>\n";
-        out << "\t\t\t<string>" << ui->edtOutFilename->text() << ".png</string>\n";
+        out << "\t\t\t<string>" << outFile << ".png</string>\n";
         out << "\t\t</dict>\n";
         out << "\t</dict>\n</plist>";
     }
 
-    pixmapRects.clear();
-    images.clear();
+    //pixmapRects.clear();
     result.clear();
 }
 
@@ -295,7 +294,7 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
             }
 
             //add rect
-            stPixmapRect pixmapRect(QRect(spaces[j].x(), spaces[j].y(), rects[i].rect.width(), rects[i].rect.height()), rects[i].pImage, rects[i].filename);
+            stPixmapRect pixmapRect(QRect(spaces[j].x(), spaces[j].y(), rects[i].rect.width(), rects[i].rect.height()), rects[i].image, rects[i].filename);
             packed.push_back(pixmapRect);
             resultSize.setWidth(std::max(resultSize.width(), pixmapRect.rect.x() + pixmapRect.rect.width()));
             resultSize.setHeight(std::max(resultSize.height(), pixmapRect.rect.y() + pixmapRect.rect.height()));
@@ -328,10 +327,11 @@ void MainWindow::on_btnSelectDirectory_clicked() {
 }
 
 void MainWindow::on_btnReset_clicked() {
-    model->removeRows(0, model->rowCount());
     ui->lblPreview->clear();
     ui->lblPreview->setText("Preview Image");
     ui->lblSize->setText("0 x 0");
+    model->removeRows(0, model->rowCount());
+    pixmapRects.clear();
 }
 
 void MainWindow::on_rbtPref_prefix_clicked() {

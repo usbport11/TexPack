@@ -7,20 +7,20 @@
     <x>0</x>
     <y>0</y>
     <width>820</width>
-    <height>600</height>
+    <height>623</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>TexPack</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QListView" name="listView">
+   <widget class="QListView" name="lstvwSourceFiles">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>80</y>
+      <y>160</y>
       <width>171</width>
-      <height>471</height>
+      <height>421</height>
      </rect>
     </property>
     <property name="editTriggers">
@@ -31,7 +31,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
+      <y>90</y>
       <width>170</width>
       <height>30</height>
      </rect>
@@ -44,9 +44,9 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>139</y>
+      <y>160</y>
       <width>621</width>
-      <height>411</height>
+      <height>421</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -66,7 +66,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>16</y>
+      <y>20</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -85,7 +85,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Remove color</string>
+     <string>Remove background</string>
     </property>
    </widget>
    <widget class="QPushButton" name="btnCompactImage">
@@ -132,7 +132,7 @@
      <rect>
       <x>280</x>
       <y>50</y>
-      <width>113</width>
+      <width>171</width>
       <height>20</height>
      </rect>
     </property>
@@ -223,7 +223,7 @@
      <rect>
       <x>460</x>
       <y>110</y>
-      <width>113</width>
+      <width>171</width>
       <height>20</height>
      </rect>
     </property>
@@ -261,6 +261,32 @@
     </property>
     <property name="checked">
      <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblResultFile">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Result file (plist)</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblSourceFiles">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>61</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Source files</string>
     </property>
    </widget>
   </widget>

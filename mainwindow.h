@@ -21,21 +21,21 @@ namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 struct stPixmapRect {
-    QRect rect;
-    QImage* pImage;
+    QRect rect;//holding new coordinates after pack
+    QImage image;
     QString filename;
     stPixmapRect() {
         rect = QRect(0,0,0,0);
-        pImage = nullptr;
+        image = QImage();
         filename = "";
     }
-    stPixmapRect(QRect inRect, QImage* inImage) {
+    stPixmapRect(QRect inRect, const QImage& inImage) {
         rect = inRect;
-        pImage = inImage;
+        image = inImage;
     }
-    stPixmapRect(QRect inRect, QImage* inImage, QString inFilename) {
+    stPixmapRect(QRect inRect, const QImage& inImage, QString inFilename) {
         rect = inRect;
-        pImage = inImage;
+        image = inImage;
         filename = inFilename;
     }
 };
@@ -55,19 +55,16 @@ private slots:
     void on_btnRemoveColor_clicked();
     void on_btnCompactImage_clicked();
     void on_btnPackImages_clicked();
-    std::vector<stPixmapRect> packRects2(std::vector<stPixmapRect> rects, QSize& size);
-
     void on_btnSelectDirectory_clicked();
-
     void on_btnReset_clicked();
-
     void on_rbtPref_prefix_clicked();
-
     void on_rbtPref_filename_clicked();
 
 private:
     Ui::MainWindow* ui;
     QStringListModel *model;
     QString saveDirectory;
+    std::vector<stPixmapRect> pixmapRects;
+    std::vector<stPixmapRect> packRects2(std::vector<stPixmapRect> rects, QSize& size);
 };
 #endif // MAINWINDOW_H
