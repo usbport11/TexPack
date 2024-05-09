@@ -1,8 +1,8 @@
 PNG files packer (create texture atlas).
 
 Passed:
-1) Remove bacground color from image (top left pixel as base color)
-2) Crop image by transparent background pixels
+1) Remove background color from image (top left pixel as base color)
+2) Crop image by transparent background pixels (usually using after previous step)
 3) Pack images in one image
 4) Export to plist format
 5) Fix artifacts while image create, remove back and crop
