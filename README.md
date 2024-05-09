@@ -11,6 +11,7 @@ Passed:
 8) Restore image in list by R key
 9) Naming frames inside plist file by png files names or prefix
 10) Preview selected source image (result image once on finish)
+11) Reset all actions
 
 To do:
 1) Apply changes to all pictures
