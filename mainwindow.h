@@ -51,7 +51,6 @@ public:
 private slots:
     bool eventFilter(QObject* object, QEvent* event) override;
     void on_btnFilesOpen_clicked();
-    void on_listView_clicked(const QModelIndex& index);
     void on_btnRemoveColor_clicked();
     void on_btnCompactImage_clicked();
     void on_btnPackImages_clicked();
@@ -59,6 +58,8 @@ private slots:
     void on_btnReset_clicked();
     void on_rbtPref_prefix_clicked();
     void on_rbtPref_filename_clicked();
+    void on_btnCrop_clicked();
+    void on_lstvwSourceFiles_clicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow* ui;

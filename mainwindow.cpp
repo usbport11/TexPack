@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
     saveDirectory = qApp->applicationDirPath();
     ui->lblDirectoryPath->setText(saveDirectory);
     ui->edtAlphaLevel->setValidator(new QIntValidator(0, 255, this));
+    ui->edtCropWidth->setValidator(new QIntValidator(0, 255, this));
+    ui->edtCropHeight->setValidator(new QIntValidator(0, 255, this));
 }
 
 MainWindow::~MainWindow() {
@@ -71,29 +73,6 @@ void MainWindow::on_btnFilesOpen_clicked() {
     }
 }
 
-void MainWindow::on_listView_clicked(const QModelIndex &index) {
-    ui->lblPreview->clear();
-
-    QPixmap mainPixmap = QPixmap::fromImage(pixmapRects[index.row()].image); //error!
-    QSize size = mainPixmap.size();
-
-    ui->lblSize->setText(QString::number(size.width()) + " x "+ QString::number(size.height()));
-
-    if(ui->lblPreview->width() <= size.width() || ui->lblPreview->height() <= size.height()) {
-        float ratio = 0;
-        if(size.width() > size.height()) {
-            ratio = (float)ui->lblPreview->width() / size.width();
-        }
-        else {
-            ratio = (float)ui->lblPreview->height() / size.height();
-        }
-        ui->lblPreview->setPixmap(mainPixmap.scaled(size.width() * ratio, size.height() * ratio, Qt::KeepAspectRatio));
-    }
-    else {
-        ui->lblPreview->setPixmap(mainPixmap);
-    }
-}
-
 void MainWindow::on_btnRemoveColor_clicked() {
     int index = ui->lstvwSourceFiles->currentIndex().row();
     if(model->rowCount() <= 0 || index < 0) {
@@ -106,6 +85,7 @@ void MainWindow::on_btnRemoveColor_clicked() {
     }
     maskPixmap.setMask(maskPixmap.createHeuristicMask());
     image = QImage(maskPixmap.toImage());
+
     ui->lblPreview->setPixmap(maskPixmap);
 }
 
@@ -121,7 +101,6 @@ void MainWindow::on_btnCompactImage_clicked() {
     }
 
     QString preLevel = ui->edtAlphaLevel->text();
-    preLevel.replace(" ", "");
     int level = 50;
     if(preLevel.length() > 0) {
       level = preLevel.toInt();
@@ -145,7 +124,7 @@ void MainWindow::on_btnCompactImage_clicked() {
     image = image.copy(rect);
 
     QPixmap newPixmap = QPixmap::fromImage(image);
-    QSize size = mainPixmap.size();
+    QSize size = newPixmap.size();
 
     ui->lblPreview->setPixmap(newPixmap);
     ui->lblSize->setText(QString::number(size.width()) + " x " + QString::number(size.height()));
@@ -340,4 +319,75 @@ void MainWindow::on_rbtPref_prefix_clicked() {
 
 void MainWindow::on_rbtPref_filename_clicked() {
     ui->edtKeyPrefix->setEnabled(false);
+}
+
+void MainWindow::on_btnCrop_clicked() {
+    int index = ui->lstvwSourceFiles->currentIndex().row();
+    if(model->rowCount() <= 0 || index < 0) {
+        return;
+    }
+    QImage& image = pixmapRects[index].image;
+    QPixmap mainPixmap(QPixmap::fromImage(image));
+    if(mainPixmap.isNull()) {
+        return;
+    }
+
+    QString strVal;
+    int cropWidth;
+    int cropHeight;
+
+    strVal = ui->edtCropWidth->text();
+    cropWidth = 0;
+    if(strVal.length() > 0) {
+        cropWidth = strVal.toInt();
+    }
+
+    strVal = ui->edtCropHeight->text();
+    cropHeight = 0;
+    if(strVal.length() > 0) {
+        cropHeight = strVal.toInt();
+    }
+
+    if(cropWidth * 2 >= image.rect().width() || cropHeight * 2 >= image.rect().height()) {
+        return;
+    }
+
+    QRect rect(image.rect().x() + cropWidth, image.rect().y() + cropHeight,
+               image.rect().width() - cropWidth*2, image.rect().height() - cropHeight*2);
+    image = image.copy(rect);
+    QMessageBox box;
+    box.setText(QString::number(rect.x()) + " " +
+                QString::number(rect.y()) + " " +
+                QString::number(rect.width()) + " " +
+                QString::number(rect.height()));
+    box.exec();
+
+    QPixmap newPixmap = QPixmap::fromImage(image);
+    QSize size = newPixmap.size();
+
+    ui->lblPreview->setPixmap(newPixmap);
+    ui->lblSize->setText(QString::number(size.width()) + " x " + QString::number(size.height()));
+}
+
+void MainWindow::on_lstvwSourceFiles_clicked(const QModelIndex &index) {
+    ui->lblPreview->clear();
+
+    QPixmap mainPixmap = QPixmap::fromImage(pixmapRects[index.row()].image); //error!
+    QSize size = mainPixmap.size();
+
+    ui->lblSize->setText(QString::number(size.width()) + " x "+ QString::number(size.height()));
+
+    if(ui->lblPreview->width() <= size.width() || ui->lblPreview->height() <= size.height()) {
+        float ratio = 0;
+        if(size.width() > size.height()) {
+            ratio = (float)ui->lblPreview->width() / size.width();
+        }
+        else {
+            ratio = (float)ui->lblPreview->height() / size.height();
+        }
+        ui->lblPreview->setPixmap(mainPixmap.scaled(size.width() * ratio, size.height() * ratio, Qt::KeepAspectRatio));
+    }
+    else {
+        ui->lblPreview->setPixmap(mainPixmap);
+    }
 }
