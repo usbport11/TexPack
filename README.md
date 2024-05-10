@@ -1,6 +1,6 @@
-PNG files packer (create texture atlas).
+PNG files packer (create texture atlas) with plist file.
 
-Passed:
+Ready:
 1) Remove background color from image (top left pixel as base color)
 2) Crop image by transparent background pixels (usually using after previous step)
 3) Pack images in one image
@@ -12,13 +12,13 @@ Passed:
 9) Naming frames inside plist file by png files names or prefix
 10) Preview selected source image (result image once on finish)
 11) Reset all actions
+12) Crop by pixels number
+13) Open files now add files without remove existed files in list
 
 To do:
-1) Apply changes to all pictures
+1) Multiselect
 2) Sizing at window (packed picture size more than free space on form)
-3) Remove/add pictures in list view (half)
 4) Preview result image
-5) Crop by pixels number
 
 <br/><img src="screen.png" /><br/>
 
