@@ -13,6 +13,7 @@
 #include <QtMath>
 #include <QTextStream>
 #include <QKeyEvent>
+#include <QSettings>
 #include <vector>
 #include <algorithm>
 
@@ -64,8 +65,9 @@ private slots:
 private:
     Ui::MainWindow* ui;
     QStringListModel *model;
-    QString saveDirectory;
     std::vector<stPixmapRect> pixmapRects;
     std::vector<stPixmapRect> packRects2(std::vector<stPixmapRect> rects, QSize& size);
+    void loadSettings();
+    void saveSettings();
 };
 #endif // MAINWINDOW_H
