@@ -14,6 +14,7 @@ Ready:
 11) Reset all actions
 12) Crop by pixels number
 13) Open files now add files without remove existed files in list
+14) Settings file (load at start, save on exit)
 
 To do:
 1) Multiselect
