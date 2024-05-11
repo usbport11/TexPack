@@ -154,20 +154,19 @@ void MainWindow::on_btnPackImages_clicked() {
 
     QString fullFileName;
     QString prefixName;
-    QString outFile = ui->edtOutFilename->text();
-    outFile.replace(" ", "");
+    QString outFile = ui->edtOutFilename->text().simplified();
     if(outFile.length() <= 0) {
         outFile = "out";
     }
 
     //export png
-    fullFileName = ui->lblDirectoryPath->text() + "/" + outFile + ".png";
+    fullFileName = ui->edtDirectoryPath->text() + "/" + outFile + ".png";
     QFile pngFile(fullFileName);
     pngFile.open(QIODevice::WriteOnly);
     mainPixmap.save(&pngFile, "PNG");
 
     //export plist
-    fullFileName = ui->lblDirectoryPath->text() + "/"+ outFile + ".plist";
+    fullFileName = ui->edtDirectoryPath->text() + "/"+ outFile + ".plist";
     QFile plistFfile(fullFileName);
     if (plistFfile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&plistFfile);
@@ -175,8 +174,7 @@ void MainWindow::on_btnPackImages_clicked() {
         out << "\t<dict>\n\t\t<key>frames</key>\n\t\t<dict>\n";
         for(size_t i=0; i < result.size(); i++) {
             if(ui->edtKeyPrefix->isEnabled()) {
-                prefixName = ui->edtKeyPrefix->text();
-                prefixName.replace(" ", "");
+                prefixName = ui->edtKeyPrefix->text().simplified();
                 if(prefixName.length() <= 0) {
                     prefixName = "pt";
                 }
@@ -304,7 +302,7 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
 }
 
 void MainWindow::on_btnSelectDirectory_clicked() {
-    ui->lblDirectoryPath->setText(QFileDialog::getExistingDirectory(this, tr("Open Directory"), "C:\\", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks));
+    ui->edtDirectoryPath->setText(QFileDialog::getExistingDirectory(this, tr("Open Directory"), "C:\\", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks));
 }
 
 void MainWindow::on_btnReset_clicked() {
@@ -374,7 +372,7 @@ void MainWindow::on_btnCrop_clicked() {
 void MainWindow::on_lstvwSourceFiles_clicked(const QModelIndex &index) {
     ui->lblPreview->clear();
 
-    QPixmap mainPixmap = QPixmap::fromImage(pixmapRects[index.row()].image); //error!
+    QPixmap mainPixmap = QPixmap::fromImage(pixmapRects[index.row()].image);
     QSize size = mainPixmap.size();
 
     ui->lblSize->setText(QString::number(size.width()) + " x "+ QString::number(size.height()));
@@ -398,7 +396,7 @@ void MainWindow::loadSettings() {
     QSettings settings(qApp->applicationDirPath() + "/settings.conf", QSettings::IniFormat);
     settings.beginGroup("main");
     ui->edtOutFilename->setText(settings.value("outFile", "out").toString());
-    ui->lblDirectoryPath->setText(settings.value("saveDirectory", qApp->applicationDirPath()).toString());
+    ui->edtDirectoryPath->setText(settings.value("saveDirectory", qApp->applicationDirPath()).toString());
     ui->edtKeyPrefix->setText(settings.value("keyPrefix", "pt").toString());
     ui->edtKeyPrefix->setEnabled(settings.value("prefixEnable", true).toBool());
     ui->edtAlphaLevel->setText(settings.value("alphaLevel", "50").toString());
@@ -410,9 +408,9 @@ void MainWindow::loadSettings() {
 void MainWindow::saveSettings() {
     QSettings settings(qApp->applicationDirPath() + "/settings.conf", QSettings::IniFormat);
     settings.beginGroup("main");
-    settings.setValue("outFile", ui->edtOutFilename->text());
-    settings.setValue("saveDirectory", ui->lblDirectoryPath->text());
-    settings.setValue("keyPrefix", ui->edtKeyPrefix->text());
+    settings.setValue("outFile", ui->edtOutFilename->text().simplified());
+    settings.setValue("saveDirectory", ui->edtDirectoryPath->text());
+    settings.setValue("keyPrefix", ui->edtKeyPrefix->text().simplified());
     settings.setValue("prefixEnable", ui->edtKeyPrefix->isEnabled());
     settings.setValue("alphaLevel", ui->edtAlphaLevel->text());
     settings.setValue("cropWidth", ui->edtCropWidth->text());

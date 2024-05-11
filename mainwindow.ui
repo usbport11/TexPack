@@ -18,35 +18,38 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>180</y>
+      <y>130</y>
       <width>171</width>
-      <height>401</height>
+      <height>451</height>
      </rect>
     </property>
     <property name="editTriggers">
      <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::SingleSelection</enum>
     </property>
    </widget>
    <widget class="QPushButton" name="btnFilesOpen">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
-      <width>170</width>
-      <height>30</height>
+      <y>70</y>
+      <width>171</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Add file(s)...</string>
+     <string>Add file(s) ...</string>
     </property>
    </widget>
    <widget class="QLabel" name="lblPreview">
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>180</y>
+      <y>160</y>
       <width>621</width>
-      <height>401</height>
+      <height>421</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -66,7 +69,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>20</y>
+      <y>10</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -81,7 +84,7 @@
       <x>280</x>
       <y>10</y>
       <width>171</width>
-      <height>30</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
@@ -92,22 +95,22 @@
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>10</y>
+      <y>39</y>
       <width>171</width>
-      <height>30</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Compact</string>
+     <string>Crop by edge alpha</string>
     </property>
    </widget>
    <widget class="QPushButton" name="btnPackImages">
     <property name="geometry">
      <rect>
       <x>640</x>
-      <y>50</y>
+      <y>130</y>
       <width>171</width>
-      <height>30</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
@@ -118,8 +121,8 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>50</y>
-      <width>170</width>
+      <y>40</y>
+      <width>171</width>
       <height>20</height>
      </rect>
     </property>
@@ -131,8 +134,8 @@
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>50</y>
-      <width>171</width>
+      <y>40</y>
+      <width>101</width>
       <height>20</height>
      </rect>
     </property>
@@ -144,7 +147,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>50</y>
+      <y>40</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -156,14 +159,14 @@
    <widget class="QPushButton" name="btnSelectDirectory">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>50</y>
+      <x>640</x>
+      <y>70</y>
       <width>171</width>
-      <height>31</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Select directory</string>
+     <string>Select directory ...</string>
     </property>
    </widget>
    <widget class="QPushButton" name="btnReset">
@@ -172,7 +175,7 @@
       <x>640</x>
       <y>10</y>
       <width>171</width>
-      <height>31</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
@@ -183,7 +186,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>80</y>
+      <y>70</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -192,24 +195,11 @@
      <string>Save directory</string>
     </property>
    </widget>
-   <widget class="QLabel" name="lblDirectoryPath">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>80</y>
-      <width>531</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Path</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="lblKeyPrefix">
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>110</y>
+      <y>130</y>
       <width>51</width>
       <height>16</height>
      </rect>
@@ -222,7 +212,7 @@
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>110</y>
+      <y>130</y>
       <width>101</width>
       <height>20</height>
      </rect>
@@ -235,7 +225,7 @@
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>110</y>
+      <y>130</y>
       <width>82</width>
       <height>17</height>
      </rect>
@@ -251,7 +241,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>110</y>
+      <y>130</y>
       <width>82</width>
       <height>17</height>
      </rect>
@@ -267,20 +257,20 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
+      <y>10</y>
       <width>81</width>
-      <height>20</height>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Result file (plist)</string>
+     <string>Results file name</string>
     </property>
    </widget>
    <widget class="QLabel" name="lblSourceFiles">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>150</y>
+      <y>100</y>
       <width>61</width>
       <height>16</height>
      </rect>
@@ -293,20 +283,20 @@
     <property name="geometry">
      <rect>
       <x>640</x>
-      <y>140</y>
+      <y>100</y>
       <width>171</width>
-      <height>30</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Crop</string>
+     <string>Crop by size</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="edtCropWidth">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>150</y>
+      <x>280</x>
+      <y>100</y>
       <width>101</width>
       <height>20</height>
      </rect>
@@ -319,7 +309,7 @@
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>150</y>
+      <y>100</y>
       <width>101</width>
       <height>20</height>
      </rect>
@@ -332,7 +322,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>150</y>
+      <y>100</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -345,13 +335,26 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>150</y>
+      <y>100</y>
       <width>47</width>
       <height>13</height>
      </rect>
     </property>
     <property name="text">
      <string>Height</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="edtDirectoryPath">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>70</y>
+      <width>351</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
