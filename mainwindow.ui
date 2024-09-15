@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>820</width>
-    <height>623</height>
+    <height>696</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>10</x>
       <y>130</y>
       <width>171</width>
-      <height>451</height>
+      <height>521</height>
      </rect>
     </property>
     <property name="editTriggers">
@@ -47,9 +47,9 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>160</y>
+      <y>250</y>
       <width>621</width>
-      <height>421</height>
+      <height>401</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -108,7 +108,7 @@
     <property name="geometry">
      <rect>
       <x>640</x>
-      <y>130</y>
+      <y>170</y>
       <width>171</width>
       <height>21</height>
      </rect>
@@ -195,64 +195,6 @@
      <string>Save directory</string>
     </property>
    </widget>
-   <widget class="QLabel" name="lblKeyPrefix">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>130</y>
-      <width>51</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Key prefix</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="edtKeyPrefix">
-    <property name="geometry">
-     <rect>
-      <x>460</x>
-      <y>130</y>
-      <width>101</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>pt</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="rbtPref_prefix">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>130</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Prefix</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="rbtPref_filename">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>130</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>FileName</string>
-    </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
-   </widget>
    <widget class="QLabel" name="lblResultFile">
     <property name="geometry">
      <rect>
@@ -308,7 +250,7 @@
    <widget class="QLineEdit" name="edtCropHeight">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>510</x>
       <y>100</y>
       <width>101</width>
       <height>20</height>
@@ -334,10 +276,10 @@
    <widget class="QLabel" name="lblCropHeight">
     <property name="geometry">
      <rect>
-      <x>390</x>
+      <x>430</x>
       <y>100</y>
-      <width>47</width>
-      <height>13</height>
+      <width>41</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
@@ -355,6 +297,148 @@
     </property>
     <property name="readOnly">
      <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="grpbKeyType">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>130</y>
+      <width>201</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Key type</string>
+    </property>
+    <widget class="QRadioButton" name="rbtPref_filename">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>82</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>FileName</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbtPref_prefix">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>20</y>
+       <width>82</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Prefix</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="grpbPackType">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>190</y>
+      <width>201</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Pack type</string>
+    </property>
+    <widget class="QRadioButton" name="rbtPackTypeCompact">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>82</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Compact</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbtPackTypeOrder">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>20</y>
+       <width>82</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>By order</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="lblKeyPrefix">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>150</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Key prefix</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="edtKeyPrefix">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>150</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>pt</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblColumnNumber">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>200</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Column number</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="edtColumnNumber">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>200</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1</string>
     </property>
    </widget>
   </widget>

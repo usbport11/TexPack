@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->edtAlphaLevel->setValidator(new QIntValidator(0, 255, this));
     ui->edtCropWidth->setValidator(new QIntValidator(0, 255, this));
     ui->edtCropHeight->setValidator(new QIntValidator(0, 255, this));
+    ui->edtColumnNumber->setValidator(new QIntValidator(0, 255, this));
 
     loadSettings();
 }
@@ -133,12 +134,27 @@ void MainWindow::on_btnCompactImage_clicked() {
     ui->lblSize->setText(QString::number(size.width()) + " x " + QString::number(size.height()));
 }
 
+//save func
 void MainWindow::on_btnPackImages_clicked() {
     int rowNumber = model->rowCount();
     if(!rowNumber) return;
 
+    std::vector<stPixmapRect> result;
     QSize resultSize(0, 0);
-    std::vector<stPixmapRect> result = packRects2(pixmapRects, resultSize);
+    QRadioButton* rbt = ui->grpbPackType->findChild<QRadioButton*>("rbtPackTypeCompact");
+    if(rbt) {
+        if(rbt->isChecked()) {
+            result = packRects2(pixmapRects, resultSize);
+        }
+        else {
+            QString strColumns = ui->edtColumnNumber->text();
+            int columns = 0;
+            if(strColumns.length() > 0) {
+                columns = strColumns.toInt();
+            }
+            result = packRectsByOrder(pixmapRects, resultSize, columns);
+        }
+    }
 
     QImage resultImage(QSize(resultSize.width(), resultSize.height()), QImage::Format_RGBA8888);
     QPainter resultPainter(&resultImage);
@@ -238,7 +254,6 @@ void MainWindow::on_btnPackImages_clicked() {
         out << "\t</dict>\n</plist>";
     }
 
-    //pixmapRects.clear();
     result.clear();
 }
 
@@ -299,6 +314,44 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
     size = resultSize;
 
     return packed;
+}
+
+std::vector<stPixmapRect> MainWindow::packRectsByOrder(std::vector<stPixmapRect> inRects, QSize& resultSize, int cellsNumber) {
+  std::vector<stPixmapRect> packed;
+  if(inRects.empty()) {
+    return packed;
+  }
+
+  QSize offset(0, 0);
+  int currentCell = 0;
+  int maxY = 0;
+
+  for(size_t i=0; i<inRects.size(); i++) {
+    stPixmapRect nextRect = stPixmapRect(QRect(inRects[i].rect.x() + offset.width(),
+      inRects[i].rect.y() + offset.height(),
+      inRects[i].rect.width(),
+      inRects[i].rect.height()),
+      inRects[i].image,
+      inRects[i].filename);
+    QString info = QString::number(nextRect.rect.x()) + " " +
+      QString::number(nextRect.rect.x()) + " " +
+      QString::number(nextRect.rect.width()) + " " +
+      QString::number(nextRect.rect.height());
+    packed.push_back(nextRect);
+    offset.setWidth(nextRect.rect.x() + nextRect.rect.width());
+    maxY = std::max(maxY, nextRect.rect.y() + nextRect.rect.height());
+    resultSize.setWidth(std::max(resultSize.width(), nextRect.rect.x() + nextRect.rect.width()));
+    resultSize.setHeight(std::max(resultSize.height(), nextRect.rect.y() + nextRect.rect.height()));
+    currentCell ++;
+    if(currentCell >= cellsNumber) {
+      offset.setWidth(0);
+      offset.setHeight(std::max(offset.height(), maxY));
+      currentCell = 0;
+    }
+  }
+
+  resultSize = QSize(254,254);
+  return packed;
 }
 
 void MainWindow::on_btnSelectDirectory_clicked() {
@@ -402,6 +455,7 @@ void MainWindow::loadSettings() {
     ui->edtAlphaLevel->setText(settings.value("alphaLevel", "50").toString());
     ui->edtCropWidth->setText(settings.value("cropWidth", "0").toString());
     ui->edtCropHeight->setText(settings.value("cropHeight", "0").toString());
+    ui->edtColumnNumber->setText(settings.value("columnNumber", "0").toString());
     settings.endGroup();
 }
 
@@ -415,5 +469,6 @@ void MainWindow::saveSettings() {
     settings.setValue("alphaLevel", ui->edtAlphaLevel->text());
     settings.setValue("cropWidth", ui->edtCropWidth->text());
     settings.setValue("cropHeight", ui->edtCropHeight->text());
+    settings.setValue("columnNumber", ui->edtColumnNumber->text());
     settings.endGroup();
 }
