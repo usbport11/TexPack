@@ -15,6 +15,7 @@ Ready:
 12) Crop by pixels number
 13) Open files now add files without remove existed files in list
 14) Settings file (load at start, save on exit)
+15) Option to pack images simple way (one by one)
 
 To do:
 1) Multiselect
