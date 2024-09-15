@@ -350,7 +350,6 @@ std::vector<stPixmapRect> MainWindow::packRectsByOrder(std::vector<stPixmapRect>
     }
   }
 
-  resultSize = QSize(254,254);
   return packed;
 }
 
