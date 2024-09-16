@@ -16,6 +16,7 @@ Ready:
 13) Open files now add files without remove existed files in list
 14) Settings file (load at start, save on exit)
 15) Option to pack images simple way (one by one) with column number
+16) Fix pack order while pack by compoct method
 
 To do:
 1) Multiselect
