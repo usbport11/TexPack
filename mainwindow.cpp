@@ -144,7 +144,7 @@ void MainWindow::on_btnPackImages_clicked() {
     QRadioButton* rbt = ui->grpbPackType->findChild<QRadioButton*>("rbtPackTypeCompact");
     if(rbt) {
         if(rbt->isChecked()) {
-            result = packRects2(pixmapRects, resultSize);
+            result = packRectsCompact(pixmapRects, resultSize);
         }
         else {
             QString strColumns = ui->edtColumnNumber->text();
@@ -257,7 +257,7 @@ void MainWindow::on_btnPackImages_clicked() {
     result.clear();
 }
 
-std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects, QSize& size) {
+std::vector<stPixmapRect> MainWindow::packRectsCompact(std::vector<stPixmapRect> rects, QSize& size) {
     std::vector<stPixmapRect> packed;
     if(rects.empty()) {
         return packed;
@@ -278,7 +278,7 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
     } heightLess;
     std::sort(rects.begin(), rects.end(), heightLess);
 
-    int startWidth = std::max(qCeil(qSqrt(area / 0.95)), maxWidth); //optimal width?
+    int startWidth = std::max(qCeil(qSqrt(area / 0.95)), maxWidth);//maxWidth alway smaller?
     std::vector<QRect> spaces;
     spaces.push_back(QRect(0, 0, startWidth, INT_MAX));
 
@@ -294,19 +294,17 @@ std::vector<stPixmapRect> MainWindow::packRects2(std::vector<stPixmapRect> rects
             resultSize.setWidth(std::max(resultSize.width(), pixmapRect.rect.x() + pixmapRect.rect.width()));
             resultSize.setHeight(std::max(resultSize.height(), pixmapRect.rect.y() + pixmapRect.rect.height()));
 
-            //split space
+            //split space (need control order to push)
             QRect lastSpace = spaces[j];
             spaces.erase(spaces.begin() + j);
-            //left
-            spaces.push_back(QRect(lastSpace.x() + pixmapRect.rect.width(),
-                                   lastSpace.y(),
-                                   lastSpace.width() - pixmapRect.rect.width(),
-                                   pixmapRect.rect.height()));
-            //bottom
-            spaces.push_back(QRect(lastSpace.x(),
-                                   lastSpace.y() + pixmapRect.rect.height(),
-                                   lastSpace.width(),
-                                   lastSpace.height() - pixmapRect.rect.height()));
+            spaces.insert(spaces.begin() + j, QRect(lastSpace.x() + pixmapRect.rect.width(),
+                lastSpace.y(),
+                lastSpace.width() - pixmapRect.rect.width(),
+                pixmapRect.rect.height()));
+            spaces.insert(spaces.begin() + j + 1, QRect(lastSpace.x(),
+                lastSpace.y() + pixmapRect.rect.height(),
+                lastSpace.width(),
+                lastSpace.height() - pixmapRect.rect.height()));
             break;
         }
     }

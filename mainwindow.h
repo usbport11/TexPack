@@ -66,7 +66,7 @@ private:
     Ui::MainWindow* ui;
     QStringListModel *model;
     std::vector<stPixmapRect> pixmapRects;
-    std::vector<stPixmapRect> packRects2(std::vector<stPixmapRect> rects, QSize& size);
+    std::vector<stPixmapRect> packRectsCompact(std::vector<stPixmapRect> rects, QSize& size);
     std::vector<stPixmapRect> packRectsByOrder(std::vector<stPixmapRect> inRects, QSize& resultSize, int cellsNumber);
     void loadSettings();
     void saveSettings();
