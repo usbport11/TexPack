@@ -17,6 +17,7 @@ Ready:
 14) Settings file (load at start, save on exit)
 15) Option to pack images simple way (one by one) with column number
 16) Fix pack order while pack by compact method
+17) Plist file from single atlas file (not ready)
 
 To do:
 1) Multiselect
