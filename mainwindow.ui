@@ -441,6 +441,19 @@
      <string>1</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="btnPackFromAtlas">
+    <property name="geometry">
+     <rect>
+      <x>640</x>
+      <y>210</y>
+      <width>171</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pack from atlas</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

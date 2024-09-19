@@ -62,12 +62,17 @@ private slots:
     void on_btnCrop_clicked();
     void on_lstvwSourceFiles_clicked(const QModelIndex &index);
 
+    void on_btnPackFromAtlas_clicked();
+
 private:
     Ui::MainWindow* ui;
     QStringListModel *model;
     std::vector<stPixmapRect> pixmapRects;
     std::vector<stPixmapRect> packRectsCompact(std::vector<stPixmapRect> rects, QSize& size);
     std::vector<stPixmapRect> packRectsByOrder(std::vector<stPixmapRect> inRects, QSize& resultSize, int cellsNumber);
+    std::vector<stPixmapRect> packFromAtlas(QImage& image);
+    QString createResultPngFile(std::vector<stPixmapRect>& result, QSize resultSize);
+    void createPlistFile(std::vector<stPixmapRect>& result, QSize resultSize, QString pngFilename);
     void loadSettings();
     void saveSettings();
 };

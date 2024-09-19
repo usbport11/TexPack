@@ -134,6 +134,124 @@ void MainWindow::on_btnCompactImage_clicked() {
     ui->lblSize->setText(QString::number(size.width()) + " x " + QString::number(size.height()));
 }
 
+QString MainWindow::createResultPngFile(std::vector<stPixmapRect>& result, QSize resultSize) {
+    QString fullFileName = "";
+    QImage resultImage(QSize(resultSize.width(), resultSize.height()), QImage::Format_RGBA8888);
+    QPainter resultPainter(&resultImage);
+    for(size_t i=0; i < result.size(); i++) {
+        QRect rect = result[i].rect;
+        resultPainter.fillRect(rect, Qt::transparent);
+        resultPainter.setCompositionMode(QPainter::CompositionMode_Source);
+        resultPainter.drawImage(rect, result[i].image);
+    }
+    QPixmap mainPixmap = QPixmap::fromImage(resultImage);
+    ui->lblPreview->setPixmap(mainPixmap);
+    ui->lblSize->setText(QString::number(resultSize.width()) + " x " + QString::number(resultSize.height()));
+
+    QString outFile = ui->edtOutFilename->text().simplified();
+    if(outFile.length() <= 0) {
+        outFile = "out";
+    }
+    fullFileName = ui->edtDirectoryPath->text() + "/" + outFile + ".png";
+    QFile pngFile(fullFileName);
+    pngFile.open(QIODevice::WriteOnly);
+    mainPixmap.save(&pngFile, "PNG");
+    return fullFileName;
+}
+
+void MainWindow::createPlistFile(std::vector<stPixmapRect>& result, QSize resultSize, QString pngFilename) {
+    if(pngFilename.length() <= 0) {
+        return;
+    }
+
+    QString prefixName;
+    QString outFile = ui->edtOutFilename->text().simplified();
+    if(outFile.length() <= 0) {
+        outFile = "out";
+    }
+    QString fullFileName = ui->edtDirectoryPath->text() + "/"+ outFile + ".plist";
+    QFile plistFfile(fullFileName);
+    if (!plistFfile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return;
+    }
+    QTextStream out(&plistFfile);
+    out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist>\n<plist version=\"1.0\">\n";
+    out << "\t<dict>\n\t\t<key>frames</key>\n\t\t<dict>\n";
+    for(size_t i=0; i < result.size(); i++) {
+        if(ui->edtKeyPrefix->isEnabled()) {
+            prefixName = ui->edtKeyPrefix->text().simplified();
+            if(prefixName.length() <= 0) {
+                prefixName = "pt";
+            }
+            prefixName += QString::number(i);
+        }
+        else {
+            if(result[i].filename.length() > 0) {
+                prefixName = result[i].filename;
+                int last = prefixName.lastIndexOf(".");
+                if(last != -1) {
+                    prefixName = prefixName.left(last);
+                }
+            }
+            else {
+                prefixName = "pt";
+                prefixName += QString::number(i);
+            }
+        }
+        out << "\t\t\t<key>"<< prefixName << "</key>\n";
+        out << "\t\t\t<dict>\n";
+        out << "\t\t\t\t<key>aliases</key>\n";
+        out << "\t\t\t\t<array/>\n";
+        out << "\t\t\t\t<key>spriteOffset</key>\n";
+        out << "\t\t\t\t<string>{0,0}</string>\n";
+        out << "\t\t\t\t<key>spriteSize</key>\n";
+        out << "\t\t\t\t<string>{" << result[i].rect.width() << "," << result[i].rect.height() << "}</string>\n";
+        out << "\t\t\t\t<key>spriteSourceSize</key>\n";
+        out << "\t\t\t\t<string>{" << result[i].rect.width() << "," << result[i].rect.height() << "}</string>\n";
+        out << "\t\t\t\t<key>textureRect</key>\n";
+        out << "\t\t\t\t<string>{{" << result[i].rect.x() << "," << result[i].rect.y() << "},{" << result[i].rect.width() << "," << result[i].rect.height() << "}}</string>\n";
+        out << "\t\t\t\t<key>textureRotated</key>\n";
+        out << "\t\t\t\t<false/>\n";
+        out << "\t\t\t\t<key>triangles</key>\n";
+        //may change
+        out << "\t\t\t\t<string>1 2 3 0 1 3</string>\n";
+        out << "\t\t\t\t<key>vertices</key>\n";
+        //may change
+        out << "\t\t\t\t<string>" << result[i].rect.width() << " " << result[i].rect.height() << " " <<
+            0 << " " << result[i].rect.height() << " " <<
+            0 << " " << 0 << " " <<
+        result[i].rect.width() << " " << 0 <<
+            "</string>\n";
+        out << "\t\t\t\t<key>verticesUV</key>\n";
+        //may change
+        out << "\t\t\t\t<string>" << result[i].rect.x() + result[i].rect.width() << " " << result[i].rect.y() + result[i].rect.height() << " " <<
+            result[i].rect.x() << " " << result[i].rect.y() + result[i].rect.height() << " " <<
+            result[i].rect.x() << " " << result[i].rect.y() << " " <<
+            result[i].rect.x() + result[i].rect.width() << " " << result[i].rect.y() <<
+            "</string>\n";
+        out << "\t\t\t</dict>\n";
+    }
+    out << "\t\t</dict>\n";
+    out << "\t\t<key>metadata</key>\n";
+    out << "\t\t<dict>\n";
+    out << "\t\t\t<key>format</key>\n";
+    out << "\t\t\t<integer>3</integer>\n";
+    out << "\t\t\t<key>pixelFormat</key>\n";
+
+    //may change
+    out << "\t\t\t<string>RGBA8888</string>\n";
+    out << "\t\t\t<key>premultiplyAlpha</key>\n";
+    out << "\t\t\t<false/>\n";
+    out << "\t\t\t<key>realTextureFileName</key>\n";
+    out << "\t\t\t<string>" << pngFilename << "</string>\n";
+    out << "\t\t\t<key>size</key>\n";
+    out << "\t\t\t<string>{" << resultSize.width() << "," << resultSize.height() << "}</string>\n";
+    out << "\t\t\t<key>textureFileName</key>\n";
+    out << "\t\t\t<string>" << pngFilename << "</string>\n";
+    out << "\t\t</dict>\n";
+    out << "\t</dict>\n</plist>";
+}
+
 //save func
 void MainWindow::on_btnPackImages_clicked() {
     int rowNumber = model->rowCount();
@@ -156,103 +274,7 @@ void MainWindow::on_btnPackImages_clicked() {
         }
     }
 
-    QImage resultImage(QSize(resultSize.width(), resultSize.height()), QImage::Format_RGBA8888);
-    QPainter resultPainter(&resultImage);
-    for(size_t i=0; i < result.size(); i++) {
-        QRect rect = result[i].rect;
-        resultPainter.fillRect(rect, Qt::transparent);
-        resultPainter.setCompositionMode(QPainter::CompositionMode_Source);
-        resultPainter.drawImage(rect, result[i].image);
-    }
-    QPixmap mainPixmap = QPixmap::fromImage(resultImage);
-    ui->lblPreview->setPixmap(mainPixmap);
-    ui->lblSize->setText(QString::number(resultSize.width()) + " x " + QString::number(resultSize.height()));
-
-    QString fullFileName;
-    QString prefixName;
-    QString outFile = ui->edtOutFilename->text().simplified();
-    if(outFile.length() <= 0) {
-        outFile = "out";
-    }
-
-    //export png
-    fullFileName = ui->edtDirectoryPath->text() + "/" + outFile + ".png";
-    QFile pngFile(fullFileName);
-    pngFile.open(QIODevice::WriteOnly);
-    mainPixmap.save(&pngFile, "PNG");
-
-    //export plist
-    fullFileName = ui->edtDirectoryPath->text() + "/"+ outFile + ".plist";
-    QFile plistFfile(fullFileName);
-    if (plistFfile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QTextStream out(&plistFfile);
-        out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist>\n<plist version=\"1.0\">\n";
-        out << "\t<dict>\n\t\t<key>frames</key>\n\t\t<dict>\n";
-        for(size_t i=0; i < result.size(); i++) {
-            if(ui->edtKeyPrefix->isEnabled()) {
-                prefixName = ui->edtKeyPrefix->text().simplified();
-                if(prefixName.length() <= 0) {
-                    prefixName = "pt";
-                }
-                prefixName += QString::number(i);
-            }
-            else {
-                prefixName = result[i].filename;
-                prefixName = prefixName.left(prefixName.lastIndexOf("."));
-            }
-            out << "\t\t\t<key>"<< prefixName << "</key>\n";
-            out << "\t\t\t<dict>\n";
-            out << "\t\t\t\t<key>aliases</key>\n";
-            out << "\t\t\t\t<array/>\n";
-            out << "\t\t\t\t<key>spriteOffset</key>\n";
-            out << "\t\t\t\t<string>{0,0}</string>\n";
-            out << "\t\t\t\t<key>spriteSize</key>\n";
-            out << "\t\t\t\t<string>{" << result[i].rect.width() << "," << result[i].rect.height() << "}</string>\n";
-            out << "\t\t\t\t<key>spriteSourceSize</key>\n";
-            out << "\t\t\t\t<string>{" << result[i].rect.width() << "," << result[i].rect.height() << "}</string>\n";
-            out << "\t\t\t\t<key>textureRect</key>\n";
-            out << "\t\t\t\t<string>{{" << result[i].rect.x() << "," << result[i].rect.y() << "},{" << result[i].rect.width() << "," << result[i].rect.height() << "}}</string>\n";
-            out << "\t\t\t\t<key>textureRotated</key>\n";
-            out << "\t\t\t\t<false/>\n";
-            out << "\t\t\t\t<key>triangles</key>\n";
-            //may change
-            out << "\t\t\t\t<string>1 2 3 0 1 3</string>\n";
-            out << "\t\t\t\t<key>vertices</key>\n";
-            //may change
-            out << "\t\t\t\t<string>" << result[i].rect.width() << " " << result[i].rect.height() << " " <<
-                0 << " " << result[i].rect.height() << " " <<
-                0 << " " << 0 << " " <<
-                result[i].rect.width() << " " << 0 <<
-                "</string>\n";
-            out << "\t\t\t\t<key>verticesUV</key>\n";
-            //may change
-            out << "\t\t\t\t<string>" << result[i].rect.x() + result[i].rect.width() << " " << result[i].rect.y() + result[i].rect.height() << " " <<
-                result[i].rect.x() << " " << result[i].rect.y() + result[i].rect.height() << " " <<
-                result[i].rect.x() << " " << result[i].rect.y() << " " <<
-                result[i].rect.x() + result[i].rect.width() << " " << result[i].rect.y() <<
-                "</string>\n";
-            out << "\t\t\t</dict>\n";
-        }
-        out << "\t\t</dict>\n";
-        out << "\t\t<key>metadata</key>\n";
-        out << "\t\t<dict>\n";
-        out << "\t\t\t<key>format</key>\n";
-        out << "\t\t\t<integer>3</integer>\n";
-        out << "\t\t\t<key>pixelFormat</key>\n";
-
-        //may change
-        out << "\t\t\t<string>RGBA8888</string>\n";
-        out << "\t\t\t<key>premultiplyAlpha</key>\n";
-        out << "\t\t\t<false/>\n";
-        out << "\t\t\t<key>realTextureFileName</key>\n";
-        out << "\t\t\t<string>" << outFile << ".png" << "</string>\n";
-        out << "\t\t\t<key>size</key>\n";
-        out << "\t\t\t<string>{" << resultSize.width() << "," << resultSize.height() << "}</string>\n";
-        out << "\t\t\t<key>textureFileName</key>\n";
-        out << "\t\t\t<string>" << outFile << ".png</string>\n";
-        out << "\t\t</dict>\n";
-        out << "\t</dict>\n</plist>";
-    }
+    createPlistFile(result, resultSize, createResultPngFile(result, resultSize));
 
     result.clear();
 }
@@ -349,6 +371,77 @@ std::vector<stPixmapRect> MainWindow::packRectsByOrder(std::vector<stPixmapRect>
   }
 
   return packed;
+}
+
+std::vector<stPixmapRect> MainWindow::packFromAtlas(QImage& image) {
+    //here ideal atlas sitaution (offset exist and it same everywhere)
+    //need add support of manual values (offset, size, count)
+    //v1 - no spaces
+    //v2 - spaces only between sprites
+    //v21 - spaces between not equal
+    //v3 - spaces every where
+    //v31 - spaces on edges and between not equal
+    //values (countX, countY, edgeX, edgeY, offsetX, offsetY, witdh, height)
+    std::vector<stPixmapRect> packed;
+
+    QPoint offset = QPoint(0, 0);
+    QSize size = QSize(0, 0);
+    bool end = false;
+    int count[2];
+
+    if(image.rect().width() <= 0 || image.rect().height() <= 0) {
+      return packed;
+    }
+
+    QString preLevel = ui->edtAlphaLevel->text();
+    int level = 50;
+    if(preLevel.length() > 0) {
+      level = preLevel.toInt();
+    }
+
+    QString data;
+    //left top of first image
+    for (int x = 0; x < image.width(); x++) {
+        for (int y = 0; y < image.height(); y++) {
+            if (image.pixelColor(x, y).alpha() > level) {
+                offset.setX(x);
+                offset.setY(y);
+                end = true;
+                break;
+            }
+        }
+        if(end) break;
+    }
+
+    //right of first image
+    for (int x = offset.x(); x < image.width(); x++) {
+        if (image.pixelColor(x, offset.y()).alpha() < level) {
+            size.setWidth(x - offset.x());
+            break;
+        }
+    }
+
+    //bottom of first image
+    for (int y = offset.y(); y < image.height(); y++) {
+        if (image.pixelColor(offset.x(), y).alpha() < level) {
+            size.setHeight(y - offset.y());
+            break;
+        }
+    }
+
+    count[0] = image.width() / (offset.x() + size.width());
+    count[1] = image.height() / (offset.y() + size.height());
+
+    for(int i=0; i<count[0]; i++) {
+        for(int j=0; j<count[1]; j++) {
+            stPixmapRect nextRect = stPixmapRect(QRect(offset.x() * (i + 1)  + size.width() * i,
+                offset.y() * (j + 1) + size.height() * j,
+                size.width(), size.height()), image, "");
+            packed.push_back(nextRect);
+        }
+    }
+
+    return packed;
 }
 
 void MainWindow::on_btnSelectDirectory_clicked() {
@@ -468,4 +561,15 @@ void MainWindow::saveSettings() {
     settings.setValue("cropHeight", ui->edtCropHeight->text());
     settings.setValue("columnNumber", ui->edtColumnNumber->text());
     settings.endGroup();
+}
+
+void MainWindow::on_btnPackFromAtlas_clicked() {
+    int index = ui->lstvwSourceFiles->currentIndex().row();
+    if(model->rowCount() <= 0 || index < 0) {
+        return;
+    }
+    QImage& image = pixmapRects[index].image;
+    std::vector<stPixmapRect> result = packFromAtlas(image);
+    createPlistFile(result, pixmapRects[index].image.size(), pixmapRects[index].filename);
+    result.clear();
 }
