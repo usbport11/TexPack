@@ -26,23 +26,39 @@ To do:
 
 <br/><img src="screen.png" /><br/>
 
-Using in cocos2d-x:
-<pre>
+Using in cocos2d-x (single sprite):
+```
 SpriteFrameCache* cache = SpriteFrameCache::getInstance();
 cache->addSpriteFramesWithFile("resources/out.plist");
-
 auto visibleSize = Director::getInstance()->getVisibleSize();
 Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
 auto frame = a->getSpriteFrameByName("pt0");
 auto sprite = Sprite::createWithSpriteFrame(frame);
 sprite->setPosition(0, 0);
-sprite->setAnchorPoint(Vec2(0,0));
-sprite->retain();
+sprite->setAnchorPoint(Vec2(0, 0));
 this->addChild(sprite);
-</pre>
+```
 
-<br/>
+Using in cocos2d-x (single sprite):
+```
+auto spritecache = SpriteFrameCache::getInstance();
+std::vector<SpriteFrame*> animFrames;
+spritecache->addSpriteFramesWithFile("anim/fox.plist");
+animFrames.pushBack(spritecache->getSpriteFrameByName("fox_pt0"));
+animFrames.pushBack(spritecache->getSpriteFrameByName("fox_pt1"));
+animFrames.pushBack(spritecache->getSpriteFrameByName("fox_pt2"));
+animFrames.pushBack(spritecache->getSpriteFrameByName("fox_pt3"));
+cocos2d::Sprite* animSprite_fox = Sprite::createWithSpriteFrame(animFrames.front());
+animSprite_fox->setPosition(200, 400);
+animSprite_fox->setScale(4.0);
+animSprite_fox->setName("anim_fox");
+animSprite_fox->setVisible(true);
+cocos2d::Animation* animation_fox = Animation::createWithSpriteFrames(animFrames, 0.1);
+cocos2d::Animate* animate_fox = Animate::create(animation_fox);
+animSprite_fox->runAction(RepeatForever::create(animate_fox));
+this->addChild(animSprite_fox, 0);
+animFrames.clear();
+```
 
 Deploy
 
