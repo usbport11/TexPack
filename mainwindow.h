@@ -61,8 +61,9 @@ private slots:
     void on_rbtPref_filename_clicked();
     void on_btnCrop_clicked();
     void on_lstvwSourceFiles_clicked(const QModelIndex &index);
-
     void on_btnPackFromAtlas_clicked();
+    void on_rbtPackTypeCompact_clicked();
+    void on_rbtPackTypeOrder_clicked();
 
 private:
     Ui::MainWindow* ui;

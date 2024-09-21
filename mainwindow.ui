@@ -429,6 +429,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="edtColumnNumber">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>510</x>
@@ -438,7 +441,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>1</string>
+     <string>4</string>
     </property>
    </widget>
    <widget class="QPushButton" name="btnPackFromAtlas">

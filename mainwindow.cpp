@@ -174,6 +174,7 @@ void MainWindow::createPlistFile(std::vector<stPixmapRect>& result, QSize result
     if (!plistFfile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         return;
     }
+
     QTextStream out(&plistFfile);
     out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist>\n<plist version=\"1.0\">\n";
     out << "\t<dict>\n\t\t<key>frames</key>\n\t\t<dict>\n";
@@ -564,12 +565,28 @@ void MainWindow::saveSettings() {
 }
 
 void MainWindow::on_btnPackFromAtlas_clicked() {
-    int index = ui->lstvwSourceFiles->currentIndex().row();
-    if(model->rowCount() <= 0 || index < 0) {
+    int row = ui->lstvwSourceFiles->currentIndex().row();
+    if(model->rowCount() <= 0 || row < 0) {
         return;
     }
-    QImage& image = pixmapRects[index].image;
+    QModelIndex index = model->index(row);
+    QString outFile = ui->edtOutFilename->text().simplified();
+    if(outFile.length() <= 0) {
+        outFile = "out";
+    }
+    QString fullFileName = ui->edtDirectoryPath->text() + "/" + outFile + ".png";
+    QFile sourceFile(index.data().toString());
+    sourceFile.copy(fullFileName);
+    QImage& image = pixmapRects[row].image;
     std::vector<stPixmapRect> result = packFromAtlas(image);
-    createPlistFile(result, pixmapRects[index].image.size(), pixmapRects[index].filename);
+    createPlistFile(result, pixmapRects[row].image.size(), fullFileName);
     result.clear();
+}
+
+void MainWindow::on_rbtPackTypeCompact_clicked() {
+    ui->edtColumnNumber->setEnabled(false);
+}
+
+void MainWindow::on_rbtPackTypeOrder_clicked() {
+    ui->edtColumnNumber->setEnabled(true);
 }
