@@ -42,7 +42,7 @@ this->addChild(sprite);
 Using in cocos2d-x (single sprite):
 ```
 auto spritecache = SpriteFrameCache::getInstance();
-std::vector<SpriteFrame*> animFrames;
+Vector<SpriteFrame*> animFrames;
 spritecache->addSpriteFramesWithFile("anim/fox.plist");
 animFrames.pushBack(spritecache->getSpriteFrameByName("fox_pt0"));
 animFrames.pushBack(spritecache->getSpriteFrameByName("fox_pt1"));
