@@ -28,14 +28,13 @@ To do:
 
 Using in cocos2d-x (single sprite):
 ```
-SpriteFrameCache* cache = SpriteFrameCache::getInstance();
-cache->addSpriteFramesWithFile("resources/out.plist");
-auto visibleSize = Director::getInstance()->getVisibleSize();
-Vec2 origin = Director::getInstance()->getVisibleOrigin();
-auto frame = a->getSpriteFrameByName("pt0");
+auto cache = SpriteFrameCache::getInstance();
+cache->addSpriteFramesWithFile("anim/grass.plist");
+auto frame = cache->getSpriteFrameByName("gr0");
 auto sprite = Sprite::createWithSpriteFrame(frame);
-sprite->setPosition(0, 0);
-sprite->setAnchorPoint(Vec2(0, 0));
+sprite->setPosition(300, 300);
+sprite->setScale(4.0);
+sprite->getTexture()->setAliasTexParameters();
 this->addChild(sprite);
 ```
 
