@@ -23,6 +23,7 @@ To do:
 1) Multiselect
 2) Sizing at window (packed picture size more than free space on form)
 4) Preview result image
+5) Magic wand functionality for single atlas file
 
 <br/><img src="screen.png" /><br/>
 
