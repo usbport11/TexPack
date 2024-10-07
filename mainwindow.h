@@ -71,7 +71,7 @@ private:
     std::vector<stPixmapRect> pixmapRects;
     std::vector<stPixmapRect> packRectsCompact(std::vector<stPixmapRect> rects, QSize& size);
     std::vector<stPixmapRect> packRectsByOrder(std::vector<stPixmapRect> inRects, QSize& resultSize, int cellsNumber);
-    std::vector<stPixmapRect> packFromAtlas(QImage& image);
+    void packFromAtlas2(QImage& image, std::vector<stPixmapRect>& rects);
     QString createResultPngFile(std::vector<stPixmapRect>& result, QSize resultSize);
     void createPlistFile(std::vector<stPixmapRect>& result, QSize resultSize, QString pngFilename);
     void loadSettings();

@@ -445,6 +445,69 @@ std::vector<stPixmapRect> MainWindow::packFromAtlas(QImage& image) {
     return packed;
 }
 
+bool pointInRects(const QPoint& point, const std::vector<stPixmapRect>& rects) {
+    for(size_t i=0; i<rects.size(); i++) {
+        if(rects[i].rect.contains(point)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void MainWindow::packFromAtlas2(QImage& image, std::vector<stPixmapRect>& rects) {
+    if(image.rect().width() <= 0 || image.rect().height() <= 0) {
+      return;
+    }
+
+    QString preLevel = ui->edtAlphaLevel->text();
+    int level = 50;
+    if(preLevel.length() > 0) {
+      level = preLevel.toInt();
+    }
+
+    QRect rect = QRect(0, 0, 0, 0);
+
+    //left top image
+    bool end = false;
+    for (int x = 0; x < image.width(); x++) {
+        for (int y = 0; y < image.height(); y++) {
+            if (image.pixelColor(x, y).alpha() > level && !pointInRects(QPoint(x, y), rects)) {
+                rect.setX(x);
+                rect.setY(y);
+                rect.setWidth(1);
+                rect.setHeight(1);
+                end = true;
+                break;
+            }
+        }
+        if(end) break;
+    }
+    if(!end) {
+        return;
+    }
+
+    //right of image
+    for (int x = rect.x(); x < image.width(); x++) {
+        if (image.pixelColor(x, rect.y()).alpha() < level) {
+            rect.setWidth(x - rect.x());
+            break;
+        }
+    }
+
+    //bottom of mage
+    for (int y = rect.y(); y < image.height(); y++) {
+        if (image.pixelColor(rect.x(), y).alpha() < level) {
+            rect.setHeight(y - rect.y());
+            break;
+        }
+    }
+
+    if(end) {
+        rects.push_back(stPixmapRect(rect, image, ""));
+        packFromAtlas2(image, rects);
+    }
+}
+
 void MainWindow::on_btnSelectDirectory_clicked() {
     ui->edtDirectoryPath->setText(QFileDialog::getExistingDirectory(this, tr("Open Directory"), "C:\\", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks));
 }
@@ -578,7 +641,9 @@ void MainWindow::on_btnPackFromAtlas_clicked() {
     QFile sourceFile(index.data().toString());
     sourceFile.copy(fullFileName);
     QImage& image = pixmapRects[row].image;
-    std::vector<stPixmapRect> result = packFromAtlas(image);
+    std::vector<stPixmapRect> result;
+    packFromAtlas2(image, result);
+    //std::vector<stPixmapRect> result = packFromAtlas(image);
     createPlistFile(result, pixmapRects[row].image.size(), fullFileName);
     result.clear();
 }
