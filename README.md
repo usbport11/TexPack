@@ -38,7 +38,7 @@ sprite->getTexture()->setAliasTexParameters();
 this->addChild(sprite);
 ```
 
-Using in cocos2d-x (single sprite):
+Using in cocos2d-x (animated sprite):
 ```
 auto spritecache = SpriteFrameCache::getInstance();
 Vector<SpriteFrame*> animFrames;
