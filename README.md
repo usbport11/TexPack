@@ -17,7 +17,7 @@ Ready:
 14) Settings file (load at start, save on exit)
 15) Option to pack images simple way (one by one) with column number
 16) Fix pack order while pack by compact method
-17) Plist file from single atlas file. Source png file will be copied to destination folder (need fix some cases)
+17) Plist file from single atlas file. Source png file will be copied to destination folder. Work only with rectangles. Source image must have spaces.
 
 To do:
 1) Multiselect
